@@ -451,58 +451,189 @@
     </main>
 
 
-    <script>
+   <script type="module">
+    import {
+        collection,
+        addDoc,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-        const accessRadios =
-            document.querySelectorAll(
-                'input[name="accessType"]'
-            );
-
-        const priceInput =
-            document.getElementById("price");
+    import {
+        auth,
+        db
+    } from "../js/firebase-config.js";
 
 
-        accessRadios.forEach((radio) => {
+    const accessRadios =
+        document.querySelectorAll(
+            'input[name="accessType"]'
+        );
 
-            radio.addEventListener("change", () => {
+    const priceInput =
+        document.getElementById("price");
 
-                if (radio.value === "paid" && radio.checked) {
 
-                    priceInput.disabled = false;
-                    priceInput.required = true;
+    accessRadios.forEach((radio) => {
 
-                }
+        radio.addEventListener("change", () => {
 
-                if (radio.value === "free" && radio.checked) {
+            if (radio.value === "paid" && radio.checked) {
 
-                    priceInput.disabled = true;
-                    priceInput.required = false;
-                    priceInput.value = "";
+                priceInput.disabled = false;
+                priceInput.required = true;
 
-                }
+            }
 
-            });
+            if (radio.value === "free" && radio.checked) {
+
+                priceInput.disabled = true;
+                priceInput.required = false;
+                priceInput.value = "";
+
+            }
 
         });
 
-
-        const form =
-            document.getElementById("addBookForm");
-
-        const formMessage =
-            document.getElementById("formMessage");
+    });
 
 
-        form.addEventListener("submit", (event) => {
+    const form =
+        document.getElementById("addBookForm");
 
-            event.preventDefault();
+    const formMessage =
+        document.getElementById("formMessage");
+
+
+    form.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+
+        const user = auth.currentUser;
+
+
+        if (!user) {
 
             formMessage.textContent =
-                "Book form is ready. Firestore connection will be added in the next step.";
+                "You must be logged in to add a book.";
 
-        });
+            return;
 
-    </script>
+        }
+
+
+        const accessType =
+            document.querySelector(
+                'input[name="accessType"]:checked'
+            ).value;
+
+
+        const bookData = {
+
+            title:
+                document.getElementById("title").value.trim(),
+
+            author:
+                document.getElementById("author").value.trim(),
+
+            description:
+                document.getElementById("description").value.trim(),
+
+            category:
+                document.getElementById("category").value,
+
+            originalLanguage:
+                document.getElementById("originalLanguage").value,
+
+            tags:
+                document.getElementById("tags").value.trim(),
+
+            slug:
+                document.getElementById("slug").value.trim(),
+
+            coverImage:
+                document.getElementById("coverImage").value.trim(),
+
+            backgroundImage:
+                document.getElementById("backgroundImage").value.trim(),
+
+            bannerImage:
+                document.getElementById("bannerImage").value.trim(),
+
+            free:
+                accessType === "free",
+
+            price:
+                accessType === "paid"
+                    ? Number(priceInput.value)
+                    : 0,
+
+            status:
+                document.getElementById("status").value,
+
+            readerCount: 0,
+
+            saveCount: 0,
+
+            ratingAverage: 0,
+
+            ratingCount: 0,
+
+            chapterCount: 0,
+
+            createdBy:
+                user.uid,
+
+            createdAt:
+                serverTimestamp(),
+
+            updatedAt:
+                serverTimestamp()
+
+        };
+
+
+        try {
+
+            formMessage.textContent =
+                "Saving book...";
+
+
+            const bookRef =
+                await addDoc(
+                    collection(db, "books"),
+                    bookData
+                );
+
+
+            formMessage.textContent =
+                "Book saved successfully!";
+
+
+            console.log(
+                "Book ID:",
+                bookRef.id
+            );
+
+
+            form.reset();
+
+            priceInput.disabled = true;
+            priceInput.required = false;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            formMessage.textContent =
+                "Something went wrong while saving the book.";
+
+        }
+
+    });
+
+</script>
 
 </body>
 </html>
