@@ -2,61 +2,82 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <title>Reading - Bookeyz</title>
 
-    <title>Chapter 1 — Bookeyz</title>
-
-    <link rel="stylesheet"
-        href="../css/style.css">
-
-    <link rel="stylesheet"
-        href="../css/reader.css">
-
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/reader.css">
 </head>
-
 
 <body class="reader-page">
 
-    <!-- Reader Navigation -->
+    <!-- =========================
+         READER NAVBAR
+    ========================== -->
 
     <header class="reader-navbar">
 
-        <a href="../index.html"
-            class="reader-logo">
+        <div class="reader-navbar-inner">
 
-            Bookeyz
+            <a href="../index.html" class="reader-logo">
+                Bookeyz
+            </a>
 
-        </a>
+            <div class="reader-actions">
 
+                <a href="book.html" class="reader-back">
+                    ← Back to Book
+                </a>
 
-        <div class="reader-book-title">
-
-            Beast World:
-            The Fire Dragon Quest
+            </div>
 
         </div>
-
-
-        <a href="book.html"
-            class="back-to-book">
-
-            Back to Book
-
-        </a>
 
     </header>
 
 
-    <!-- Reading Area -->
+    <!-- =========================
+         READING PROGRESS
+    ========================== -->
 
-    <main class="reader-container">
+    <div class="reading-progress-container">
 
-        <article class="reader-content">
+        <div id="readingProgress" class="reading-progress"></div>
 
+    </div>
+
+
+    <!-- =========================
+         READER CONTENT
+    ========================== -->
+
+    <main class="reader-main">
+
+        <article class="reading-container">
+
+
+            <!-- BOOK INFORMATION -->
+
+            <div class="reader-book-info">
+
+                <p class="reader-category">
+                    FANTASY
+                </p>
+
+                <h1>
+                    Beast World: The Fire Dragon Quest
+                </h1>
+
+                <p class="reader-author">
+                    By Bookeyz
+                </p>
+
+            </div>
+
+
+            <!-- CHAPTER HEADER -->
 
             <header class="chapter-header">
 
@@ -64,56 +85,52 @@
                     CHAPTER 1
                 </p>
 
-                <h1>
+                <h2>
                     The Festival Before the Storm
-                </h1>
+                </h2>
 
-                <p class="chapter-meta">
-                    Beast World: The Fire Dragon Quest
-                </p>
+                <div class="chapter-divider"></div>
 
             </header>
 
 
-            <!-- Optional Chapter Artwork -->
+            <!-- CHAPTER ARTWORK -->
 
-            <div class="chapter-art-placeholder">
+            <div class="chapter-artwork">
 
-                <span>
-                    Chapter Artwork
-                </span>
+                <div class="artwork-placeholder">
+
+                    <span>Chapter Artwork</span>
+
+                </div>
 
             </div>
 
 
-            <!-- Story -->
+            <!-- STORY -->
 
-            <div class="story-text">
+            <section class="story-content" id="storyContent">
 
                 <p>
-                    The Ember Kingdom had never looked more alive.
+                    The kingdom of Ember was alive with celebration.
                 </p>
 
                 <p>
-                    Flags stretched across the streets,
-                    merchants filled the markets, and people
-                    gathered from every corner of the kingdom
-                    for the annual festival.
+                    Bright banners stretched between the ancient stone towers,
+                    while musicians filled the streets with songs and drums.
+                    Merchants shouted from their stalls, children ran through
+                    the crowded streets, and warriors gathered around the great
+                    festival grounds.
                 </p>
 
                 <p>
-                    Music echoed through the city while soldiers
-                    stood at the gates, watching the crowds.
+                    It was the annual Festival of Flames, a celebration held
+                    to honor the strength and history of the kingdom.
                 </p>
 
                 <p>
-                    At the heart of the kingdom stood the royal
-                    palace, where King Valoron watched the
-                    celebration from the great balcony.
-                </p>
-
-                <p>
-                    Beside him stood Queen Elira and Princess Sofia.
+                    From the highest tower of the royal palace, Princess Sofia
+                    watched the celebration below.
                 </p>
 
                 <p>
@@ -121,54 +138,75 @@
                 </p>
 
                 <p>
-                    But far beyond the kingdom's walls,
-                    something ancient had begun to stir.
+                    But something about the sky troubled her.
                 </p>
 
                 <p>
-                    The festival continued.
+                    Dark clouds were slowly gathering beyond the mountains.
                 </p>
 
                 <p>
-                    The people laughed.
+                    Sofia turned toward the horizon.
                 </p>
 
                 <p>
-                    And nobody knew that the first sign of the
-                    coming storm was already approaching.
+                    Somewhere beyond those mountains, something was coming.
                 </p>
 
-            </div>
+                <p>
+                    And before the night was over, the kingdom of Ember would
+                    never be the same again.
+                </p>
+
+            </section>
 
 
-            <!-- Chapter Navigation -->
+            <!-- CHAPTER NAVIGATION -->
 
             <nav class="chapter-navigation">
 
-                <a href="#"
-                    class="chapter-nav-button disabled">
-
-                    ← Previous
-
+                <a href="#" class="chapter-nav-button disabled">
+                    ←
+                    <span>
+                        Previous
+                    </span>
                 </a>
 
 
-                <a href="book.html"
-                    class="chapter-nav-center">
+                <a href="book.html" class="chapter-nav-center">
+                    <span class="chapter-nav-small">
+                        CHAPTER
+                    </span>
 
-                    All Chapters
-
+                    <strong>
+                        1
+                    </strong>
                 </a>
 
 
-                <a href="reader.html"
-                    class="chapter-nav-button">
-
-                    Next →
-
+                <a href="#" class="chapter-nav-button">
+                    <span>
+                        Next
+                    </span>
+                    →
                 </a>
 
             </nav>
+
+
+            <!-- READER FOOTER -->
+
+            <div class="reader-footer">
+
+                <p>
+                    You're reading on Bookeyz.
+                </p>
+
+                <a href="../index.html">
+                    Return to Bookeyz
+                </a>
+
+            </div>
 
 
         </article>
@@ -176,15 +214,30 @@
     </main>
 
 
-    <!-- Reader Footer -->
+    <!-- =========================
+         READING PROGRESS SCRIPT
+    ========================== -->
 
-    <footer class="reader-footer">
+    <script>
 
-        <p>
-            Bookeyz — Stories worth getting lost in.
-        </p>
+        const progressBar = document.getElementById("readingProgress");
 
-    </footer>
+        window.addEventListener("scroll", () => {
+
+            const scrollTop = window.scrollY;
+
+            const documentHeight =
+                document.documentElement.scrollHeight -
+                document.documentElement.clientHeight;
+
+            const progress =
+                (scrollTop / documentHeight) * 100;
+
+            progressBar.style.width = progress + "%";
+
+        });
+
+    </script>
 
 
 </body>
