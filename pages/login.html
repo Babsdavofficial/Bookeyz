@@ -1,0 +1,186 @@
+]<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Bookeyz</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+</head>
+
+
+<body>
+
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Bookeyz
+        </div>
+
+        <div class="nav-links">
+
+            <a href="../index.html">
+                Home
+            </a>
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a href="register.html">
+                Register
+            </a>
+
+        </div>
+
+    </nav>
+
+
+
+    <main class="auth-page">
+
+
+        <div class="auth-container">
+
+
+            <h1>Welcome Back</h1>
+
+
+            <p>
+                Login to continue reading on Bookeyz.
+            </p>
+
+
+
+            <form id="loginForm">
+
+
+                <div class="form-group">
+
+                    <label for="loginEmail">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                </div>
+
+
+
+                <button type="submit">
+                    Login
+                </button>
+
+
+                <p id="loginMessage"></p>
+
+
+            </form>
+
+
+
+            <p class="auth-switch">
+
+                Don't have an account?
+
+                <a href="register.html">
+                    Create one
+                </a>
+
+            </p>
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <script type="module">
+
+        import { loginUser }
+        from "../js/auth.js";
+
+
+        const loginForm =
+            document.getElementById("loginForm");
+
+
+        const loginMessage =
+            document.getElementById("loginMessage");
+
+
+
+        loginForm.addEventListener("submit", async (event) => {
+
+            event.preventDefault();
+
+
+            const email =
+                document.getElementById("loginEmail").value.trim();
+
+
+            const password =
+                document.getElementById("loginPassword").value;
+
+
+
+            const result =
+                await loginUser(email, password);
+
+
+
+            if (result.success) {
+
+                loginMessage.textContent =
+                    "Login successful!";
+
+
+                setTimeout(() => {
+
+                    window.location.href = "../index.html";
+
+                }, 1000);
+
+
+            } else {
+
+                loginMessage.textContent =
+                    result.error;
+
+            }
+
+        });
+
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | Bookeyz</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Bookeyz
+        </div>
+
+        <div class="nav-links">
+            <a href="../index.html">Home</a>
+            <a href="books.html">Books</a>
+            <a href="login.html">Login</a>
+        </div>
+
+    </nav>
+
+
+    <main class="auth-page">
+
+        <div class="auth-container">
+
+            <h1>Create Your Bookeyz Account</h1>
+
+            <p>
+                Create an account to start reading and save your favorite stories.
+            </p>
+
+
+            <form id="registerForm">
+
+                <div class="form-group">
+
+                    <label for="registerEmail">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="registerEmail"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="registerPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="registerPassword"
+                        placeholder="Create a password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="Confirm your password"
+                        required
+                    >
+
+                </div>
+
+
+                <button type="submit">
+                    Create Account
+                </button>
+
+                <p id="registerMessage"></p>
+
+            </form>
+
+
+            <p class="auth-switch">
+                Already have an account?
+
+                <a href="login.html">
+                    Login
+                </a>
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <script type="module">
+
+        import { registerUser }
+        from "../js/auth.js";
+
+
+        const registerForm =
+            document.getElementById("registerForm");
+
+        const registerMessage =
+            document.getElementById("registerMessage");
+
+
+        registerForm.addEventListener("submit", async (event) => {
+
+            event.preventDefault();
+
+
+            const email =
+                document.getElementById("registerEmail").value.trim();
+
+            const password =
+                document.getElementById("registerPassword").value;
+
+            const confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+
+            if (password !== confirmPassword) {
+
+                registerMessage.textContent =
+                    "Passwords do not match.";
+
+                return;
+            }
+
+
+            const result =
+                await registerUser(email, password);
+
+
+            if (result.success) {
+
+                registerMessage.textContent =
+                    "Account created successfully!";
+
+                setTimeout(() => {
+
+                    window.location.href = "../index.html";
+
+                }, 1000);
+
+            } else {
+
+                registerMessage.textContent =
+                    result.error;
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
