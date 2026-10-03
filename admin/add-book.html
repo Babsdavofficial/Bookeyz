@@ -451,7 +451,7 @@
     </main>
 
 
-   <script type="module">
+  <script type="module">
     import {
         collection,
         addDoc,
@@ -463,6 +463,10 @@
         db
     } from "../js/firebase-config.js";
 
+
+    // =========================
+    // ACCESS & PRICE
+    // =========================
 
     const accessRadios =
         document.querySelectorAll(
@@ -497,6 +501,10 @@
     });
 
 
+    // =========================
+    // FORM
+    // =========================
+
     const form =
         document.getElementById("addBookForm");
 
@@ -508,6 +516,10 @@
 
         event.preventDefault();
 
+
+        // =========================
+        // CHECK LOGIN
+        // =========================
 
         const user = auth.currentUser;
 
@@ -522,16 +534,42 @@
         }
 
 
-        const accessType =
+        // =========================
+        // GET ACCESS TYPE
+        // =========================
+
+        const selectedAccess =
             document.querySelector(
                 'input[name="accessType"]:checked'
-            ).value;
+            );
 
+
+        const accessType =
+            selectedAccess.value;
+
+
+        // =========================
+        // GET BOOK STATUS
+        // =========================
+
+        const selectedStatus =
+            document.querySelector(
+                'input[name="bookStatus"]:checked'
+            );
+
+
+        const status =
+            selectedStatus.value;
+
+
+        // =========================
+        // CREATE BOOK DATA
+        // =========================
 
         const bookData = {
 
             title:
-                document.getElementById("title").value.trim(),
+                document.getElementById("bookTitle").value.trim(),
 
             author:
                 document.getElementById("author").value.trim(),
@@ -543,7 +581,7 @@
                 document.getElementById("category").value,
 
             originalLanguage:
-                document.getElementById("originalLanguage").value,
+                document.getElementById("language").value,
 
             tags:
                 document.getElementById("tags").value.trim(),
@@ -569,7 +607,7 @@
                     : 0,
 
             status:
-                document.getElementById("status").value,
+                status,
 
             readerCount: 0,
 
@@ -593,6 +631,10 @@
         };
 
 
+        // =========================
+        // SAVE TO FIRESTORE
+        // =========================
+
         try {
 
             formMessage.textContent =
@@ -615,6 +657,8 @@
                 bookRef.id
             );
 
+
+            // Reset form
 
             form.reset();
 
