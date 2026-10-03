@@ -493,3 +493,65 @@ window.addEventListener(
 
 
 updateReadingProgress();
+
+
+
+/* =========================
+   BASIC COPY PROTECTION
+========================= */
+
+// Disable right-click
+document.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+});
+
+
+// Disable common keyboard shortcuts
+document.addEventListener("keydown", (event) => {
+
+    // Ctrl / Command key
+    const modifier = event.ctrlKey || event.metaKey;
+
+    if (!modifier) {
+        return;
+    }
+
+    const key = event.key.toLowerCase();
+
+
+    // Copy
+    if (key === "c") {
+        event.preventDefault();
+    }
+
+
+    // Cut
+    if (key === "x") {
+        event.preventDefault();
+    }
+
+
+    // Save page
+    if (key === "s") {
+        event.preventDefault();
+    }
+
+
+    // View source
+    if (key === "u") {
+        event.preventDefault();
+    }
+
+});
+
+
+// Disable selecting story text
+document.addEventListener("selectstart", (event) => {
+
+    if (
+        event.target.closest(".story-content")
+    ) {
+        event.preventDefault();
+    }
+
+});
