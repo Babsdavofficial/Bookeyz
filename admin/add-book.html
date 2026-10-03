@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Book - Bookeyz Admin</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+
+    <!-- ADMIN NAVBAR -->
+
+    <header class="admin-navbar">
+
+        <div class="admin-logo">
+            BOOKEYZ ADMIN
+        </div>
+
+        <nav>
+            <a href="index.html">Dashboard</a>
+            <a href="books.html">Books</a>
+            <a href="chapters.html">Chapters</a>
+            <a href="users.html">Users</a>
+        </nav>
+
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="admin-page">
+
+        <div class="admin-page-header">
+
+            <div>
+                <p class="admin-label">BOOK MANAGEMENT</p>
+
+                <h1>Add New Book</h1>
+
+                <p>
+                    Create a new book for your Bookeyz library.
+                </p>
+            </div>
+
+            <a href="books.html" class="admin-back-button">
+                ← Back to Books
+            </a>
+
+        </div>
+
+
+        <!-- BOOK FORM -->
+
+        <form id="addBookForm" class="admin-form">
+
+
+            <!-- BASIC INFORMATION -->
+
+            <section class="admin-card">
+
+                <h2>Basic Information</h2>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="bookTitle">
+                            Book Title
+                        </label>
+
+                        <input
+                            type="text"
+                            id="bookTitle"
+                            placeholder="Enter book title"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="author">
+                            Author
+                        </label>
+
+                        <input
+                            type="text"
+                            id="author"
+                            placeholder="Enter author name"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        rows="6"
+                        placeholder="Write a description of the book..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="category">
+                            Category
+                        </label>
+
+                        <select id="category" required>
+
+                            <option value="">
+                                Select category
+                            </option>
+
+                            <option value="fantasy">
+                                Fantasy
+                            </option>
+
+                            <option value="romance">
+                                Romance
+                            </option>
+
+                            <option value="action">
+                                Action
+                            </option>
+
+                            <option value="mystery">
+                                Mystery
+                            </option>
+
+                            <option value="comedy">
+                                Comedy
+                            </option>
+
+                            <option value="adventure">
+                                Adventure
+                            </option>
+
+                            <option value="horror">
+                                Horror
+                            </option>
+
+                            <option value="science-fiction">
+                                Science Fiction
+                            </option>
+
+                            <option value="historical-fiction">
+                                Historical Fiction
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="language">
+                            Original Language
+                        </label>
+
+                        <select id="language" required>
+
+                            <option value="">
+                                Select language
+                            </option>
+
+                            <option value="en">
+                                English
+                            </option>
+
+                            <option value="fr">
+                                French
+                            </option>
+
+                            <option value="es">
+                                Spanish
+                            </option>
+
+                            <option value="ar">
+                                Arabic
+                            </option>
+
+                            <option value="pt">
+                                Portuguese
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="tags">
+                        Tags
+                    </label>
+
+                    <input
+                        type="text"
+                        id="tags"
+                        placeholder="Example: Dragon, Kingdom, Magic, Adventure"
+                    >
+
+                    <small>
+                        Separate multiple tags with commas.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="slug">
+                        Book Slug
+                    </label>
+
+                    <input
+                        type="text"
+                        id="slug"
+                        placeholder="example: beast-world-the-fire-dragon-quest"
+                    >
+
+                    <small>
+                        Used later for clean book URLs.
+                    </small>
+
+                </div>
+
+            </section>
+
+
+            <!-- BOOK ARTWORK -->
+
+            <section class="admin-card">
+
+                <h2>Book Artwork</h2>
+
+                <p class="section-description">
+                    Add the artwork that will be used throughout the Bookeyz experience.
+                </p>
+
+
+                <div class="form-group">
+
+                    <label for="coverImage">
+                        Cover Image
+                    </label>
+
+                    <input
+                        type="text"
+                        id="coverImage"
+                        placeholder="Image URL or file location"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="backgroundImage">
+                        Background Image
+                    </label>
+
+                    <input
+                        type="text"
+                        id="backgroundImage"
+                        placeholder="Image URL or file location"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="bannerImage">
+                        Book Banner
+                    </label>
+
+                    <input
+                        type="text"
+                        id="bannerImage"
+                        placeholder="Image URL or file location"
+                    >
+
+                </div>
+
+            </section>
+
+
+            <!-- ACCESS -->
+
+            <section class="admin-card">
+
+                <h2>Access & Pricing</h2>
+
+                <div class="form-group">
+
+                    <label>
+                        Book Access
+                    </label>
+
+                    <div class="radio-group">
+
+                        <label class="radio-option">
+
+                            <input
+                                type="radio"
+                                name="accessType"
+                                value="free"
+                                checked
+                            >
+
+                            <span>Free</span>
+
+                        </label>
+
+
+                        <label class="radio-option">
+
+                            <input
+                                type="radio"
+                                name="accessType"
+                                value="paid"
+                            >
+
+                            <span>Paid</span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="price">
+                        Price (₦)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="price"
+                        min="0"
+                        step="1"
+                        placeholder="Enter price"
+                        disabled
+                    >
+
+                </div>
+
+            </section>
+
+
+            <!-- PUBLISHING -->
+
+            <section class="admin-card">
+
+                <h2>Publishing</h2>
+
+                <div class="form-group">
+
+                    <label>
+                        Book Status
+                    </label>
+
+                    <div class="radio-group">
+
+                        <label class="radio-option">
+
+                            <input
+                                type="radio"
+                                name="bookStatus"
+                                value="draft"
+                                checked
+                            >
+
+                            <span>Draft</span>
+
+                        </label>
+
+
+                        <label class="radio-option">
+
+                            <input
+                                type="radio"
+                                name="bookStatus"
+                                value="published"
+                            >
+
+                            <span>Published</span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ACTIONS -->
+
+            <div class="admin-form-actions">
+
+                <a
+                    href="books.html"
+                    class="admin-cancel-button"
+                >
+                    Cancel
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="admin-save-button"
+                >
+                    Save Book
+                </button>
+
+            </div>
+
+
+            <!-- MESSAGE -->
+
+            <p id="formMessage"></p>
+
+        </form>
+
+    </main>
+
+
+    <script>
+
+        const accessRadios =
+            document.querySelectorAll(
+                'input[name="accessType"]'
+            );
+
+        const priceInput =
+            document.getElementById("price");
+
+
+        accessRadios.forEach((radio) => {
+
+            radio.addEventListener("change", () => {
+
+                if (radio.value === "paid" && radio.checked) {
+
+                    priceInput.disabled = false;
+                    priceInput.required = true;
+
+                }
+
+                if (radio.value === "free" && radio.checked) {
+
+                    priceInput.disabled = true;
+                    priceInput.required = false;
+                    priceInput.value = "";
+
+                }
+
+            });
+
+        });
+
+
+        const form =
+            document.getElementById("addBookForm");
+
+        const formMessage =
+            document.getElementById("formMessage");
+
+
+        form.addEventListener("submit", (event) => {
+
+            event.preventDefault();
+
+            formMessage.textContent =
+                "Book form is ready. Firestore connection will be added in the next step.";
+
+        });
+
+    </script>
+
+</body>
+</html>
