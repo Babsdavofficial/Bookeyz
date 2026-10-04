@@ -314,23 +314,26 @@
         }
 
 
-        onAuthStateChanged(auth, (user) => {
+       onAuthStateChanged(auth, (user) => {
+
+    console.log("CURRENT USER:", user);
 
     if (!user) {
 
         booksList.innerHTML = `
             <p>
-                You must be logged in to access the admin area.
+                You are not logged in.
             </p>
         `;
 
         return;
     }
 
+    console.log("CURRENT UID:", user.uid);
+
     loadBooks();
 
 });
-
     </script>
    
 
