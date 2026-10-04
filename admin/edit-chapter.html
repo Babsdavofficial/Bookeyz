@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Edit Chapter | Bookeyz Admin</title>
+
+<link
+    rel="stylesheet"
+    href="../css/admin.css"
+>
+
+
+</head>
+
+<body>
+
+```
+<!-- ADMIN NAVBAR -->
+
+<header class="admin-navbar">
+
+    <div class="admin-logo">
+        BOOKEYZ ADMIN
+    </div>
+
+    <nav>
+
+        <a href="index.html">
+            Dashboard
+        </a>
+
+        <a href="books.html">
+            Books
+        </a>
+
+        <a
+            href="chapters.html"
+            class="active"
+        >
+            Chapters
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<!-- PAGE -->
+
+<main class="admin-page">
+
+
+    <div class="admin-page-header">
+
+        <div>
+
+            <h1>
+                Edit Chapter
+            </h1>
+
+            <p>
+                Update this chapter's information and story content.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- FORM -->
+
+    <section class="admin-card">
+
+        <form id="editChapterForm">
+
+
+            <div class="form-row">
+
+                <label for="chapterNumber">
+                    Chapter Number
+                </label>
+
+                <input
+                    type="number"
+                    id="chapterNumber"
+                    min="1"
+                    required
+                >
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <label for="language">
+                    Language
+                </label>
+
+                <select id="language" required>
+
+                    <option value="English">
+                        English
+                    </option>
+
+                    <option value="French">
+                        French
+                    </option>
+
+                    <option value="Spanish">
+                        Spanish
+                    </option>
+
+                    <option value="Arabic">
+                        Arabic
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="isOriginal"
+                    >
+
+                    Original Chapter
+
+                </label>
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <label for="chapterTitle">
+                    Chapter Title
+                </label>
+
+                <input
+                    type="text"
+                    id="chapterTitle"
+                    required
+                >
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <label for="chapterContent">
+                    Chapter Content
+                </label>
+
+                <textarea
+                    id="chapterContent"
+                    rows="18"
+                    required
+                ></textarea>
+
+            </div>
+
+
+
+            <h2>
+                Artwork
+            </h2>
+
+
+
+            <div class="form-row">
+
+                <label for="artwork">
+                    Chapter Artwork
+                </label>
+
+                <input
+                    type="text"
+                    id="artwork"
+                >
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <label for="backgroundImage">
+                    Background Image
+                </label>
+
+                <input
+                    type="text"
+                    id="backgroundImage"
+                >
+
+            </div>
+
+
+
+            <h2>
+                Publishing
+            </h2>
+
+
+
+            <div class="form-row">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="chapterStatus"
+                        value="draft"
+                    >
+
+                    Draft
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="chapterStatus"
+                        value="published"
+                    >
+
+                    Published
+
+                </label>
+
+            </div>
+
+
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="admin-button"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+
+
+            <p id="formMessage"></p>
+
+
+        </form>
+
+    </section>
+
+
+</main>
+
+
+
+<script type="module">
+
+
+    import {
+        doc,
+        getDoc,
+        updateDoc,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    import {
+        db
+    } from "../js/firebase-config.js";
+
+
+
+    // =========================
+    // GET CHAPTER ID
+    // =========================
+
+    const urlParams =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const chapterId =
+        urlParams.get("id");
+
+
+
+    // =========================
+    // ELEMENTS
+    // =========================
+
+    const form =
+        document.getElementById(
+            "editChapterForm"
+        );
+
+
+    const formMessage =
+        document.getElementById(
+            "formMessage"
+        );
+
+
+
+    // =========================
+    // CHECK CHAPTER ID
+    // =========================
+
+    if (!chapterId) {
+
+        formMessage.textContent =
+            "No chapter was selected.";
+
+        form.style.display =
+            "none";
+
+    }
+
+
+
+    // =========================
+    // LOAD CHAPTER
+    // =========================
+
+    async function loadChapter() {
+
+        try {
+
+            const chapterRef =
+                doc(
+                    db,
+                    "chapters",
+                    chapterId
+                );
+
+
+            const chapterSnapshot =
+                await getDoc(
+                    chapterRef
+                );
+
+
+            if (!chapterSnapshot.exists()) {
+
+                formMessage.textContent =
+                    "Chapter not found.";
+
+                form.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            const chapter =
+                chapterSnapshot.data();
+
+
+
+            // CHAPTER NUMBER
+
+            document.getElementById(
+                "chapterNumber"
+            ).value =
+                chapter.number || "";
+
+
+
+            // LANGUAGE
+
+            document.getElementById(
+                "language"
+            ).value =
+                chapter.language || "English";
+
+
+
+            // ORIGINAL
+
+            document.getElementById(
+                "isOriginal"
+            ).checked =
+                chapter.isOriginal === true;
+
+
+
+            // TITLE
+
+            document.getElementById(
+                "chapterTitle"
+            ).value =
+                chapter.title || "";
+
+
+
+            // CONTENT
+
+            document.getElementById(
+                "chapterContent"
+            ).value =
+                chapter.content || "";
+
+
+
+            // ARTWORK
+
+            document.getElementById(
+                "artwork"
+            ).value =
+                chapter.artwork || "";
+
+
+
+            // BACKGROUND
+
+            document.getElementById(
+                "backgroundImage"
+            ).value =
+                chapter.backgroundImage || "";
+
+
+
+            // STATUS
+
+            const status =
+                chapter.status || "draft";
+
+
+            const statusRadio =
+                document.querySelector(
+                    `input[name="chapterStatus"][value="${status}"]`
+                );
+
+
+            if (statusRadio) {
+
+                statusRadio.checked =
+                    true;
+
+            }
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            formMessage.textContent =
+                "Unable to load this chapter.";
+
+        }
+
+    }
+
+
+
+    // =========================
+    // SAVE CHANGES
+    // =========================
+
+    form.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            const selectedStatus =
+                document.querySelector(
+                    'input[name="chapterStatus"]:checked'
+                );
+
+
+            const updatedChapter = {
+
+                number:
+                    Number(
+                        document.getElementById(
+                            "chapterNumber"
+                        ).value
+                    ),
+
+
+                language:
+                    document.getElementById(
+                        "language"
+                    ).value,
+
+
+                isOriginal:
+                    document.getElementById(
+                        "isOriginal"
+                    ).checked,
+
+
+                title:
+                    document.getElementById(
+                        "chapterTitle"
+                    ).value.trim(),
+
+
+                content:
+                    document.getElementById(
+                        "chapterContent"
+                    ).value.trim(),
+
+
+                artwork:
+                    document.getElementById(
+                        "artwork"
+                    ).value.trim(),
+
+
+                backgroundImage:
+                    document.getElementById(
+                        "backgroundImage"
+                    ).value.trim(),
+
+
+                status:
+                    selectedStatus.value,
+
+
+                updatedAt:
+                    serverTimestamp()
+
+            };
+
+
+            try {
+
+                formMessage.textContent =
+                    "Saving changes...";
+
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "chapters",
+                        chapterId
+                    ),
+
+                    updatedChapter
+
+                );
+
+
+                formMessage.textContent =
+                    "Chapter updated successfully!";
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                formMessage.textContent =
+                    "Unable to update the chapter.";
+
+            }
+
+        }
+    );
+
+
+
+    // =========================
+    // START
+    // =========================
+
+    if (chapterId) {
+
+        loadChapter();
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>
