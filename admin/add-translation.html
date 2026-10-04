@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Add Translation | Bookeyz Admin</title>
+
+<link
+    rel="stylesheet"
+    href="../css/admin.css"
+>
+
+
+</head>
+
+<body>
+
+```
+<header class="admin-navbar">
+
+    <div class="admin-logo">
+        BOOKEYZ ADMIN
+    </div>
+
+    <nav>
+
+        <a href="index.html">Dashboard</a>
+        <a href="books.html">Books</a>
+        <a href="chapters.html">Chapters</a>
+        <a href="categories.html">Categories</a>
+        <a href="translations.html">Translations</a>
+
+    </nav>
+
+</header>
+
+
+
+<main class="admin-page">
+
+
+    <div class="admin-page-header">
+
+        <div>
+
+            <h1>
+                Add Translation
+            </h1>
+
+            <p>
+                Add a translated version of an existing chapter.
+            </p>
+
+        </div>
+
+        <a
+            href="translations.html"
+            class="admin-back-button"
+        >
+            ← Back to Translations
+        </a>
+
+    </div>
+
+
+
+    <section class="admin-card">
+
+        <form id="translationForm">
+
+
+            <!-- BOOK -->
+
+            <div class="form-row">
+
+                <label for="bookSelect">
+                    Book
+                </label>
+
+                <select
+                    id="bookSelect"
+                    required
+                >
+
+                    <option value="">
+                        Loading books...
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- CHAPTER -->
+
+            <div class="form-row">
+
+                <label for="chapterSelect">
+                    Chapter
+                </label>
+
+                <select
+                    id="chapterSelect"
+                    required
+                    disabled
+                >
+
+                    <option value="">
+                        Select a book first
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- LANGUAGE -->
+
+            <div class="form-row">
+
+                <label for="language">
+                    Translation Language
+                </label>
+
+                <select
+                    id="language"
+                    required
+                >
+
+                    <option value="">
+                        Select language
+                    </option>
+
+                    <option value="French">
+                        French
+                    </option>
+
+                    <option value="Spanish">
+                        Spanish
+                    </option>
+
+                    <option value="Arabic">
+                        Arabic
+                    </option>
+
+                    <option value="Portuguese">
+                        Portuguese
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- TITLE -->
+
+            <div class="form-row">
+
+                <label for="chapterTitle">
+                    Translated Chapter Title
+                </label>
+
+                <input
+                    type="text"
+                    id="chapterTitle"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- CONTENT -->
+
+            <div class="form-row">
+
+                <label for="chapterContent">
+                    Translated Content
+                </label>
+
+                <textarea
+                    id="chapterContent"
+                    rows="20"
+                    required
+                    placeholder="Paste the translated chapter here..."
+                ></textarea>
+
+            </div>
+
+
+
+            <!-- ARTWORK -->
+
+            <div class="form-row">
+
+                <label for="artwork">
+                    Chapter Artwork
+                </label>
+
+                <input
+                    type="text"
+                    id="artwork"
+                >
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <label for="backgroundImage">
+                    Background Image
+                </label>
+
+                <input
+                    type="text"
+                    id="backgroundImage"
+                >
+
+            </div>
+
+
+
+            <!-- STATUS -->
+
+            <h2>
+                Publishing
+            </h2>
+
+
+            <div class="form-row">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="chapterStatus"
+                        value="draft"
+                        checked
+                    >
+
+                    Draft
+
+                </label>
+
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="chapterStatus"
+                        value="published"
+                    >
+
+                    Published
+
+                </label>
+
+            </div>
+
+
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="admin-button"
+                >
+                    Save Translation
+                </button>
+
+            </div>
+
+
+            <p id="formMessage"></p>
+
+
+        </form>
+
+    </section>
+
+
+</main>
+
+
+
+<script type="module">
+
+
+    import {
+        collection,
+        getDocs,
+        addDoc,
+        query,
+        where,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    import {
+        auth,
+        db
+    } from "../js/firebase-config.js";
+
+
+
+    // =========================
+    // ELEMENTS
+    // =========================
+
+    const bookSelect =
+        document.getElementById(
+            "bookSelect"
+        );
+
+
+    const chapterSelect =
+        document.getElementById(
+            "chapterSelect"
+        );
+
+
+    const form =
+        document.getElementById(
+            "translationForm"
+        );
+
+
+    const formMessage =
+        document.getElementById(
+            "formMessage"
+        );
+
+
+
+    // =========================
+    // LOAD BOOKS
+    // =========================
+
+    async function loadBooks() {
+
+        try {
+
+            const booksSnapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        "books"
+                    )
+                );
+
+
+            bookSelect.innerHTML = `
+                <option value="">
+                    Select a book
+                </option>
+            `;
+
+
+            booksSnapshot.forEach(
+                (documentSnapshot) => {
+
+                    const book =
+                        documentSnapshot.data();
+
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        documentSnapshot.id;
+
+
+                    option.textContent =
+                        book.title ||
+                        "Untitled Book";
+
+
+                    bookSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            bookSelect.innerHTML = `
+                <option value="">
+                    Unable to load books
+                </option>
+            `;
+
+        }
+
+    }
+
+
+
+    // =========================
+    // LOAD CHAPTERS
+    // =========================
+
+    async function loadChapters(bookId) {
+
+        chapterSelect.innerHTML = `
+            <option value="">
+                Select a chapter
+            </option>
+        `;
+
+
+        chapterSelect.disabled = true;
+
+
+        if (!bookId) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const chaptersQuery =
+                query(
+                    collection(
+                        db,
+                        "chapters"
+                    ),
+
+                    where(
+                        "bookId",
+                        "==",
+                        bookId
+                    )
+                );
+
+
+            const chaptersSnapshot =
+                await getDocs(
+                    chaptersQuery
+                );
+
+
+            chaptersSnapshot.forEach(
+                (documentSnapshot) => {
+
+                    const chapter =
+                        documentSnapshot.data();
+
+
+                    // Only show the original chapter
+
+                    if (
+                        chapter.isOriginal !== true
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        documentSnapshot.id;
+
+
+                    option.textContent =
+                        `Chapter ${chapter.number} — ${chapter.title || "Untitled"}`;
+
+
+                    chapterSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+            chapterSelect.disabled = false;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            chapterSelect.innerHTML = `
+                <option value="">
+                    Unable to load chapters
+                </option>
+            `;
+
+        }
+
+    }
+
+
+
+    // =========================
+    // BOOK CHANGE
+    // =========================
+
+    bookSelect.addEventListener(
+        "change",
+        () => {
+
+            loadChapters(
+                bookSelect.value
+            );
+
+        }
+    );
+
+
+
+    // =========================
+    // SAVE TRANSLATION
+    // =========================
+
+    form.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                formMessage.textContent =
+                    "You must be logged in.";
+
+                return;
+
+            }
+
+
+            const selectedChapter =
+                chapterSelect.value;
+
+
+            if (!selectedChapter) {
+
+                formMessage.textContent =
+                    "Please select a chapter.";
+
+                return;
+
+            }
+
+
+            const originalChapterSnapshot =
+                await getDocs(
+                    query(
+                        collection(
+                            db,
+                            "chapters"
+                        ),
+
+                        where(
+                            "bookId",
+                            "==",
+                            bookSelect.value
+                        )
+                    )
+                );
+
+
+            let originalChapter = null;
+
+
+            originalChapterSnapshot.forEach(
+                (documentSnapshot) => {
+
+                    if (
+                        documentSnapshot.id ===
+                        selectedChapter
+                    ) {
+
+                        originalChapter =
+                            documentSnapshot.data();
+
+                    }
+
+                }
+            );
+
+
+            if (!originalChapter) {
+
+                formMessage.textContent =
+                    "Original chapter not found.";
+
+                return;
+
+            }
+
+
+
+            const selectedStatus =
+                document.querySelector(
+                    'input[name="chapterStatus"]:checked'
+                );
+
+
+            const translationData = {
+
+                bookId:
+                    bookSelect.value,
+
+                number:
+                    originalChapter.number,
+
+                language:
+                    document.getElementById(
+                        "language"
+                    ).value,
+
+                isOriginal:
+                    false,
+
+                title:
+                    document.getElementById(
+                        "chapterTitle"
+                    ).value.trim(),
+
+                content:
+                    document.getElementById(
+                        "chapterContent"
+                    ).value.trim(),
+
+                artwork:
+                    document.getElementById(
+                        "artwork"
+                    ).value.trim(),
+
+                backgroundImage:
+                    document.getElementById(
+                        "backgroundImage"
+                    ).value.trim(),
+
+                status:
+                    selectedStatus.value,
+
+                readerCount:
+                    0,
+
+                createdBy:
+                    user.uid,
+
+                createdAt:
+                    serverTimestamp(),
+
+                updatedAt:
+                    serverTimestamp()
+
+            };
+
+
+            try {
+
+                formMessage.textContent =
+                    "Saving translation...";
+
+
+                const translationRef =
+                    await addDoc(
+                        collection(
+                            db,
+                            "chapters"
+                        ),
+                        translationData
+                    );
+
+
+                console.log(
+                    "Translation ID:",
+                    translationRef.id
+                );
+
+
+                formMessage.textContent =
+                    "Translation saved successfully!";
+
+
+                form.reset();
+
+
+                chapterSelect.innerHTML = `
+                    <option value="">
+                        Select a chapter
+                    </option>
+                `;
+
+
+                chapterSelect.disabled = true;
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                formMessage.textContent =
+                    "Unable to save translation.";
+
+            }
+
+        }
+    );
+
+
+
+    // =========================
+    // START
+    // =========================
+
+    loadBooks();
+
+</script>
+
+</body>
+
+</html>

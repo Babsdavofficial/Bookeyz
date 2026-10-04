@@ -393,3 +393,105 @@
     }
 
 }
+
+.admin-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.admin-page-header h1 {
+    margin: 0 0 6px;
+}
+
+.admin-page-header p {
+    margin: 0;
+    color: #777;
+}
+
+.admin-button {
+    display: inline-block;
+    padding: 10px 16px;
+    background: #111;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.admin-button:hover {
+    opacity: 0.85;
+}
+
+@media (max-width: 700px) {
+    .admin-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.admin-translation-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.admin-translation-row:last-child {
+    border-bottom: none;
+}
+
+.admin-translation-info {
+    flex: 1;
+}
+
+.admin-translation-info h3 {
+    margin: 0 0 6px;
+}
+
+.admin-translation-info p {
+    margin: 0 0 10px;
+    color: #777;
+}
+
+.admin-translation-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-translation-meta span {
+    padding: 5px 9px;
+    border-radius: 5px;
+    background: #f1f1f1;
+    font-size: 13px;
+}
+
+.admin-translation-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-translation-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.delete-translation {
+    background: #e74c3c;
+    color: white;
+}
+
+@media (max-width: 700px) {
+
+    .admin-translation-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+}

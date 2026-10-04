@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Translations | Bookeyz Admin</title>
+
+<link
+    rel="stylesheet"
+    href="../css/admin.css"
+>
+
+
+</head>
+
+<body>
+
+<!-- ADMIN NAVBAR -->
+
+<header class="admin-navbar">
+
+    <div class="admin-logo">
+        BOOKEYZ ADMIN
+    </div>
+
+    <nav>
+
+        <a href="index.html">
+            Dashboard
+        </a>
+
+        <a href="books.html">
+            Books
+        </a>
+
+        <a href="chapters.html">
+            Chapters
+        </a>
+
+        <a href="categories.html">
+            Categories
+        </a>
+
+        <a
+            href="translations.html"
+            class="active"
+        >
+            Translations
+        </a>
+
+        <a href="users.html">
+            Users
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<main class="admin-page">
+
+
+    <div class="admin-page-header">
+
+        <div>
+
+          <div class="admin-page-header">
+    <div>
+        <h1>Translations</h1>
+        <p>Manage translated chapters for your books.</p>
+    </div>
+
+    <a href="add-translation.html" class="admin-button">
+        + Add Translation
+    </a>
+</div>
+           
+
+        </div>
+
+    </div>
+
+
+
+    <!-- BOOK SELECTOR -->
+
+    <section class="admin-card">
+
+        <div class="form-row">
+
+            <label for="bookSelect">
+                Select Book
+            </label>
+
+            <select id="bookSelect">
+
+                <option value="">
+                    Loading books...
+                </option>
+
+            </select>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- CHAPTER SELECTOR -->
+
+    <section class="admin-card">
+
+        <div class="form-row">
+
+            <label for="chapterSelect">
+                Select Chapter
+            </label>
+
+            <select id="chapterSelect">
+
+                <option value="">
+                    Select a book first
+                </option>
+
+            </select>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- TRANSLATIONS -->
+
+    <section class="admin-card">
+
+        <h2>
+            Available Translations
+        </h2>
+
+        <div id="translationsList">
+
+            <p>
+                Select a chapter to view its translations.
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+</main>
+
+
+
+<script type="module">
+
+    import {
+    collection,
+    getDocs,
+    query,
+    where,
+    orderBy,
+    doc,
+    deleteDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    import {
+        db
+    } from "../js/firebase-config.js";
+
+
+
+    // =========================
+    // ELEMENTS
+    // =========================
+
+    const bookSelect =
+        document.getElementById(
+            "bookSelect"
+        );
+
+
+    const chapterSelect =
+        document.getElementById(
+            "chapterSelect"
+        );
+
+
+    const translationsList =
+        document.getElementById(
+            "translationsList"
+        );
+
+
+
+    // =========================
+    // LOAD BOOKS
+    // =========================
+
+    async function loadBooks() {
+
+        try {
+
+            const booksSnapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        "books"
+                    )
+                );
+
+
+            bookSelect.innerHTML = `
+                <option value="">
+                    Select a book
+                </option>
+            `;
+
+
+            booksSnapshot.forEach(
+                (documentSnapshot) => {
+
+                    const book =
+                        documentSnapshot.data();
+
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        documentSnapshot.id;
+
+
+                    option.textContent =
+                        book.title ||
+                        "Untitled Book";
+
+
+                    bookSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            bookSelect.innerHTML = `
+                <option value="">
+                    Unable to load books
+                </option>
+            `;
+
+        }
+
+    }
+
+
+
+    // =========================
+    // LOAD CHAPTERS
+    // =========================
+
+    async function loadChapters(bookId) {
+
+        chapterSelect.innerHTML = `
+            <option value="">
+                Select a chapter
+            </option>
+        `;
+
+
+        translationsList.innerHTML = `
+            <p>
+                Select a chapter to view its translations.
+            </p>
+        `;
+
+
+        if (!bookId) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const chaptersQuery =
+                query(
+                    collection(
+                        db,
+                        "chapters"
+                    ),
+
+                    where(
+                        "bookId",
+                        "==",
+                        bookId
+                    ),
+
+                    orderBy(
+                        "number",
+                        "asc"
+                    )
+                );
+
+
+            const chaptersSnapshot =
+                await getDocs(
+                    chaptersQuery
+                );
+
+
+            chaptersSnapshot.forEach(
+                (documentSnapshot) => {
+
+                    const chapter =
+                        documentSnapshot.data();
+
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        documentSnapshot.id;
+
+
+                    option.textContent =
+                        `Chapter ${chapter.number} — ${chapter.title || "Untitled"}`;
+
+
+                    chapterSelect.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            chapterSelect.innerHTML = `
+                <option value="">
+                    Unable to load chapters
+                </option>
+            `;
+
+        }
+
+    }
+
+
+
+    // =========================
+    // LOAD TRANSLATIONS
+    // =========================
+
+    async function loadTranslations(chapterId) {
+
+    translationsList.innerHTML = "";
+
+    if (!chapterId) {
+        translationsList.innerHTML =
+            "<p>Select a chapter to view translations.</p>";
+        return;
+    }
+
+    try {
+
+        const selectedChapter =
+            document.querySelector(
+                `#chapterSelect option[value="${chapterId}"]`
+            );
+
+        if (!selectedChapter) {
+            return;
+        }
+
+        const selectedText =
+            selectedChapter.textContent;
+
+        const numberMatch =
+            selectedText.match(/Chapter\s+(\d+)/i);
+
+        if (!numberMatch) {
+            translationsList.innerHTML =
+                "<p>Unable to determine chapter number.</p>";
+            return;
+        }
+
+        const chapterNumber =
+            Number(numberMatch[1]);
+
+        const selectedBookId =
+            bookSelect.value;
+
+        const translationsQuery =
+            query(
+                collection(db, "chapters"),
+                where("bookId", "==", selectedBookId),
+                where("number", "==", chapterNumber)
+            );
+
+        const snapshot =
+            await getDocs(translationsQuery);
+
+        if (snapshot.empty) {
+
+            translationsList.innerHTML =
+                "<p>No translations found for this chapter.</p>";
+
+            return;
+        }
+
+        snapshot.forEach((documentSnapshot) => {
+
+            const translation =
+                documentSnapshot.data();
+
+            const translationId =
+                documentSnapshot.id;
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "admin-translation-row";
+
+            card.innerHTML = `
+                <div class="admin-translation-info">
+
+                    <h3>
+                        ${translation.language.toUpperCase()}
+                    </h3>
+
+                    <p>
+                        ${translation.title}
+                    </p>
+
+                    <div class="admin-translation-meta">
+
+                        <span>
+                            ${translation.isOriginal
+                                ? "Original"
+                                : "Translation"}
+                        </span>
+
+                        <span>
+                            ${translation.status}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="admin-translation-actions">
+
+                    <button
+                        class="edit-translation"
+                        data-translation-id="${translationId}">
+                        Edit
+                    </button>
+
+                    <button
+                        class="delete-translation"
+                        data-translation-id="${translationId}">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+
+            translationsList.appendChild(card);
+
+        });
+
+        const editButtons =
+            document.querySelectorAll(
+                ".edit-translation"
+            );
+
+        editButtons.forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const translationId =
+                        button.dataset.translationId;
+
+                    window.location.href =
+                        `edit-translation.html?id=${translationId}`;
+
+                }
+            );
+
+        });
+
+        const deleteButtons =
+            document.querySelectorAll(
+                ".delete-translation"
+            );
+
+        deleteButtons.forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const translationId =
+                        button.dataset.translationId;
+
+                    const confirmed =
+                        confirm(
+                            "Are you sure you want to delete this translation?"
+                        );
+
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    try {
+
+                        await deleteDoc(
+                            doc(
+                                db,
+                                "chapters",
+                                translationId
+                            )
+                        );
+
+                        alert(
+                            "Translation deleted successfully!"
+                        );
+
+                        loadTranslations(chapterId);
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                        alert(
+                            "Something went wrong while deleting the translation."
+                        );
+
+                    }
+
+                }
+            );
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        translationsList.innerHTML =
+            "<p>Unable to load translations.</p>";
+
+    }
+
+}
+
+
+
+    // =========================
+    // BOOK CHANGE
+    // =========================
+
+    bookSelect.addEventListener(
+        "change",
+        () => {
+
+            loadChapters(
+                bookSelect.value
+            );
+
+        }
+    );
+
+
+
+    // =========================
+    // CHAPTER CHANGE
+    // =========================
+
+    chapterSelect.addEventListener(
+        "change",
+        () => {
+
+            loadTranslations(
+                chapterSelect.value
+            );
+
+        }
+    );
+
+
+
+    // =========================
+    // START
+    // =========================
+
+    loadBooks();
+
+</script>
+
+
+</body>
+
+</html>

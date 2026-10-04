@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Translation — Bookeyz Admin</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+
+    <nav class="admin-navbar">
+
+        <a href="index.html">
+            Dashboard
+        </a>
+
+        <a href="books.html">
+            Books
+        </a>
+
+        <a href="chapters.html">
+            Chapters
+        </a>
+
+        <a href="categories.html">
+            Categories
+        </a>
+
+        <a href="translations.html">
+            Translations
+        </a>
+
+        <a href="users.html">
+            Users
+        </a>
+
+    </nav>
+
+
+    <main class="admin-container">
+
+        <a href="translations.html">
+            ← Back to Translations
+        </a>
+
+        <h1>
+            Edit Translation
+        </h1>
+
+
+        <form id="editTranslationForm">
+
+
+            <div class="admin-form-group">
+
+                <label for="language">
+                    Translation Language
+                </label>
+
+                <select id="language" required>
+
+                    <option value="fr">
+                        French
+                    </option>
+
+                    <option value="es">
+                        Spanish
+                    </option>
+
+                    <option value="ar">
+                        Arabic
+                    </option>
+
+                    <option value="pt">
+                        Portuguese
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="admin-form-group">
+
+                <label for="chapterTitle">
+                    Chapter Title
+                </label>
+
+                <input
+                    type="text"
+                    id="chapterTitle"
+                    required
+                >
+
+            </div>
+
+
+            <div class="admin-form-group">
+
+                <label for="chapterContent">
+                    Chapter Content
+                </label>
+
+                <textarea
+                    id="chapterContent"
+                    rows="20"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div class="admin-form-group">
+
+                <label for="artwork">
+                    Artwork URL
+                </label>
+
+                <input
+                    type="url"
+                    id="artwork"
+                >
+
+            </div>
+
+
+            <div class="admin-form-group">
+
+                <label for="backgroundImage">
+                    Background Image URL
+                </label>
+
+                <input
+                    type="url"
+                    id="backgroundImage"
+                >
+
+            </div>
+
+
+            <div class="admin-form-group">
+
+                <label>
+                    Publishing Status
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="translationStatus"
+                        value="draft"
+                        checked
+                    >
+                    Draft
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="translationStatus"
+                        value="published"
+                    >
+                    Published
+                </label>
+
+            </div>
+
+
+            <button type="submit">
+                Save Changes
+            </button>
+
+
+            <p id="formMessage"></p>
+
+        </form>
+
+    </main>
+
+
+    <script type="module">
+
+        import {
+            doc,
+            getDoc,
+            updateDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+        import {
+            auth,
+            db
+        } from "../js/firebase-config.js";
+
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const translationId =
+            urlParams.get("id");
+
+
+        const form =
+            document.getElementById(
+                "editTranslationForm"
+            );
+
+
+        const formMessage =
+            document.getElementById(
+                "formMessage"
+            );
+
+
+        if (!translationId) {
+
+            formMessage.textContent =
+                "No translation was selected.";
+
+            form.style.display =
+                "none";
+
+        }
+
+
+        async function loadTranslation() {
+
+            try {
+
+                const translationRef =
+                    doc(
+                        db,
+                        "chapters",
+                        translationId
+                    );
+
+
+                const translationSnapshot =
+                    await getDoc(
+                        translationRef
+                    );
+
+
+                if (!translationSnapshot.exists()) {
+
+                    formMessage.textContent =
+                        "Translation not found.";
+
+                    form.style.display =
+                        "none";
+
+                    return;
+
+                }
+
+
+                const translation =
+                    translationSnapshot.data();
+
+
+                document.getElementById(
+                    "language"
+                ).value =
+                    translation.language || "fr";
+
+
+                document.getElementById(
+                    "chapterTitle"
+                ).value =
+                    translation.title || "";
+
+
+                document.getElementById(
+                    "chapterContent"
+                ).value =
+                    translation.content || "";
+
+
+                document.getElementById(
+                    "artwork"
+                ).value =
+                    translation.artwork || "";
+
+
+                document.getElementById(
+                    "backgroundImage"
+                ).value =
+                    translation.backgroundImage || "";
+
+
+                const statusRadio =
+                    document.querySelector(
+                        `input[name="translationStatus"][value="${translation.status}"]`
+                    );
+
+
+                if (statusRadio) {
+
+                    statusRadio.checked =
+                        true;
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                formMessage.textContent =
+                    "Unable to load translation.";
+
+            }
+
+        }
+
+
+        form.addEventListener(
+            "submit",
+            async (event) => {
+
+                event.preventDefault();
+
+
+                const user =
+                    auth.currentUser;
+
+
+                if (!user) {
+
+                    formMessage.textContent =
+                        "You must be logged in.";
+
+                    return;
+
+                }
+
+
+                const selectedStatus =
+                    document.querySelector(
+                        'input[name="translationStatus"]:checked'
+                    );
+
+
+                const updatedTranslation = {
+
+                    language:
+                        document.getElementById(
+                            "language"
+                        ).value,
+
+                    isOriginal:
+                        false,
+
+                    title:
+                        document.getElementById(
+                            "chapterTitle"
+                        ).value.trim(),
+
+                    content:
+                        document.getElementById(
+                            "chapterContent"
+                        ).value.trim(),
+
+                    artwork:
+                        document.getElementById(
+                            "artwork"
+                        ).value.trim(),
+
+                    backgroundImage:
+                        document.getElementById(
+                            "backgroundImage"
+                        ).value.trim(),
+
+                    status:
+                        selectedStatus.value,
+
+                    updatedAt:
+                        serverTimestamp()
+
+                };
+
+
+                try {
+
+                    formMessage.textContent =
+                        "Saving changes...";
+
+
+                    await updateDoc(
+
+                        doc(
+                            db,
+                            "chapters",
+                            translationId
+                        ),
+
+                        updatedTranslation
+
+                    );
+
+
+                    formMessage.textContent =
+                        "Translation updated successfully!";
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    formMessage.textContent =
+                        "Unable to update translation.";
+
+                }
+
+            }
+        );
+
+
+        if (translationId) {
+
+            loadTranslation();
+
+        }
+
+    </script>
+
+</body>
+
+</html>
