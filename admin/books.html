@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Books | Bookeyz Admin</title>
+
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+
+    <!-- ADMIN NAVBAR -->
+
+    <header class="admin-navbar">
+
+        <div class="admin-logo">
+            BOOKEYZ ADMIN
+        </div>
+
+        <nav>
+
+            <a href="index.html">
+                Dashboard
+            </a>
+
+            <a href="books.html" class="active">
+                Books
+            </a>
+
+            <a href="chapters.html">
+                Chapters
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- PAGE -->
+
+    <main class="admin-page">
+
+        <div class="admin-page-header">
+
+            <div>
+
+                <h1>Books</h1>
+
+                <p>
+                    Manage all the books published on Bookeyz.
+                </p>
+
+            </div>
+
+            <a
+                href="add-book.html"
+                class="admin-button"
+            >
+                + Add Book
+            </a>
+
+        </div>
+
+
+        <!-- BOOK LIST -->
+
+        <section class="admin-card">
+
+            <div id="booksList">
+
+                <p>
+                    Loading books...
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script type="module">
+
+        import {
+            collection,
+            getDocs,
+            query,
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+        import {
+            db
+        } from "../js/firebase-config.js";
+
+
+        const booksList =
+            document.getElementById("booksList");
+
+
+        async function loadBooks() {
+
+            try {
+
+                const booksQuery =
+                    query(
+                        collection(db, "books"),
+                        orderBy("createdAt", "desc")
+                    );
+
+
+                const snapshot =
+                    await getDocs(booksQuery);
+
+
+                if (snapshot.empty) {
+
+                    booksList.innerHTML = `
+                        <p>
+                            No books have been added yet.
+                        </p>
+                    `;
+
+                    return;
+                }
+
+
+                booksList.innerHTML = "";
+
+
+                snapshot.forEach((documentSnapshot) => {
+
+                    const book =
+                        documentSnapshot.data();
+
+
+                    const bookId =
+                        documentSnapshot.id;
+
+
+                    const bookElement =
+                        document.createElement("div");
+
+
+                    bookElement.className =
+                        "admin-book-row";
+
+
+                    bookElement.innerHTML = `
+
+                        <div class="admin-book-info">
+
+                            <h3>
+                                ${book.title || "Untitled Book"}
+                            </h3>
+
+                            <p>
+                                ${book.author || "Unknown Author"}
+                            </p>
+
+                        </div>
+
+
+                        <div class="admin-book-meta">
+
+                            <span>
+                                ${book.category || "No Category"}
+                            </span>
+
+                            <span>
+                                ${book.free ? "Free" : "Paid"}
+                            </span>
+
+                            <span>
+                                ${book.status || "Draft"}
+                            </span>
+
+                        </div>
+
+
+                        <div class="admin-book-actions">
+
+                            <button
+                                type="button"
+                                data-book-id="${bookId}"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                type="button"
+                                data-book-id="${bookId}"
+                                class="delete-book"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    `;
+
+
+                    booksList.appendChild(bookElement);
+
+                });
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                booksList.innerHTML = `
+
+                    <p>
+                        Unable to load books.
+                    </p>
+
+                `;
+
+            }
+
+        }
+
+
+        loadBooks();
+
+    </script>
+
+</body>
+</html>

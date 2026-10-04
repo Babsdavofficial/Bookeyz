@@ -309,3 +309,87 @@
     }
 
 }
+
+
+/* =========================
+   BOOK LIST
+========================= */
+
+.admin-book-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 20px 0;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.admin-book-row:last-child {
+    border-bottom: none;
+}
+
+.admin-book-info {
+    flex: 1;
+}
+
+.admin-book-info h3 {
+    margin: 0 0 6px;
+}
+
+.admin-book-info p {
+    margin: 0;
+    color: #777;
+}
+
+.admin-book-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-book-meta span {
+    padding: 6px 10px;
+
+    border-radius: 6px;
+
+    background: #f1f1f1;
+
+    font-size: 14px;
+}
+
+.admin-book-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-book-actions button {
+    padding: 8px 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+.admin-book-actions .delete-book {
+    background: #e74c3c;
+    color: white;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .admin-book-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-book-actions {
+        width: 100%;
+    }
+
+}
