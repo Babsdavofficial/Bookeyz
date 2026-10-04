@@ -126,44 +126,8 @@
 
                         <select id="category" required>
 
-                            <option value="">
-                                Select category
-                            </option>
-
-                            <option value="fantasy">
-                                Fantasy
-                            </option>
-
-                            <option value="romance">
-                                Romance
-                            </option>
-
-                            <option value="action">
-                                Action
-                            </option>
-
-                            <option value="mystery">
-                                Mystery
-                            </option>
-
-                            <option value="comedy">
-                                Comedy
-                            </option>
-
-                            <option value="adventure">
-                                Adventure
-                            </option>
-
-                            <option value="horror">
-                                Horror
-                            </option>
-
-                            <option value="science-fiction">
-                                Science Fiction
-                            </option>
-
-                            <option value="historical-fiction">
-                                Historical Fiction
+                               <option value="">
+                                Loading categories...
                             </option>
 
                         </select>
@@ -455,6 +419,7 @@
     import {
         collection,
         addDoc,
+        getDocs,
         serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -499,6 +464,78 @@
         });
 
     });
+
+
+    // =========================
+// LOAD CATEGORIES
+// =========================
+
+const categorySelect =
+    document.getElementById("category");
+
+
+async function loadCategories() {
+
+    try {
+
+        const categoriesSnapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "categories"
+                )
+            );
+
+
+        categorySelect.innerHTML = `
+            <option value="">
+                Select category
+            </option>
+        `;
+
+
+        categoriesSnapshot.forEach(
+            (documentSnapshot) => {
+
+                const category =
+                    documentSnapshot.data();
+
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    category.name;
+
+
+                option.textContent =
+                    category.name;
+
+
+                categorySelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        categorySelect.innerHTML = `
+            <option value="">
+                Unable to load categories
+            </option>
+        `;
+
+    }
+
+}
 
 
     // =========================
@@ -676,6 +713,8 @@
         }
 
     });
+
+    loadCategories();
 
 </script>
 

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Categories | Bookeyz Admin</title>
+
+<link
+    rel="stylesheet"
+    href="../css/admin.css"
+>
+
+</head>
+
+<body>
+
+<!-- ADMIN NAVBAR -->
+
+<header class="admin-navbar">
+
+    <div class="admin-logo">
+        BOOKEYZ ADMIN
+    </div>
+
+    <nav>
+
+        <a href="index.html">
+            Dashboard
+        </a>
+
+        <a href="books.html">
+            Books
+        </a>
+
+        <a href="chapters.html">
+            Chapters
+        </a>
+
+        <a
+            href="categories.html"
+            class="active"
+        >
+            Categories
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<main class="admin-page">
+
+
+    <div class="admin-page-header">
+
+        <div>
+
+            <h1>
+                Categories
+            </h1>
+
+            <p>
+                Create and manage book categories.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ADD CATEGORY -->
+
+    <section class="admin-card">
+
+        <h2>
+            Add Category
+        </h2>
+
+
+        <form id="categoryForm">
+
+            <div class="form-row">
+
+                <label for="categoryName">
+                    Category Name
+                </label>
+
+                <input
+                    type="text"
+                    id="categoryName"
+                    placeholder="Example: Fantasy"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button
+                    type="submit"
+                    class="admin-button"
+                >
+                    Add Category
+                </button>
+
+            </div>
+
+
+            <p id="formMessage"></p>
+
+        </form>
+
+    </section>
+
+
+
+    <!-- CATEGORY LIST -->
+
+    <section class="admin-card">
+
+        <h2>
+            Existing Categories
+        </h2>
+
+
+        <div id="categoriesList">
+
+            <p>
+                Loading categories...
+            </p>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<script type="module">
+
+
+    import {
+        collection,
+        addDoc,
+        getDocs,
+        deleteDoc,
+        doc,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+    import {
+        db
+    } from "../js/firebase-config.js";
+
+
+
+    // =========================
+    // ELEMENTS
+    // =========================
+
+    const categoryForm =
+        document.getElementById(
+            "categoryForm"
+        );
+
+
+    const categoryName =
+        document.getElementById(
+            "categoryName"
+        );
+
+
+    const categoriesList =
+        document.getElementById(
+            "categoriesList"
+        );
+
+
+    const formMessage =
+        document.getElementById(
+            "formMessage"
+        );
+
+
+
+    // =========================
+    // LOAD CATEGORIES
+    // =========================
+
+    async function loadCategories() {
+
+        try {
+
+            const categoriesSnapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        "categories"
+                    )
+                );
+
+
+            categoriesList.innerHTML = "";
+
+
+            if (categoriesSnapshot.empty) {
+
+                categoriesList.innerHTML = `
+                    <p>
+                        No categories yet.
+                    </p>
+                `;
+
+                return;
+
+            }
+
+
+            categoriesSnapshot.forEach(
+                (documentSnapshot) => {
+
+                    const category =
+                        documentSnapshot.data();
+
+
+                    const categoryId =
+                        documentSnapshot.id;
+
+
+                    const categoryElement =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    categoryElement.className =
+                        "admin-book-row";
+
+
+                    categoryElement.innerHTML = `
+
+                        <div class="admin-book-info">
+
+                            <h3>
+                                ${category.name}
+                            </h3>
+
+                        </div>
+
+
+                        <div class="admin-book-actions">
+
+                            <button
+                                class="delete-category"
+                                data-category-id="${categoryId}"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    `;
+
+
+                    categoriesList.appendChild(
+                        categoryElement
+                    );
+
+
+                    const deleteButton =
+                        categoryElement.querySelector(
+                            ".delete-category"
+                        );
+
+
+                    deleteButton.addEventListener(
+                        "click",
+                        async () => {
+
+                            const confirmed =
+                                confirm(
+                                    `Delete "${category.name}"?`
+                                );
+
+
+                            if (!confirmed) {
+
+                                return;
+
+                            }
+
+
+                            try {
+
+                                await deleteDoc(
+                                    doc(
+                                        db,
+                                        "categories",
+                                        categoryId
+                                    )
+                                );
+
+
+                                loadCategories();
+
+
+                            } catch (error) {
+
+                                console.error(
+                                    error
+                                );
+
+                                alert(
+                                    "Unable to delete category."
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            categoriesList.innerHTML = `
+                <p>
+                    Unable to load categories.
+                </p>
+            `;
+
+        }
+
+    }
+
+
+
+    // =========================
+    // ADD CATEGORY
+    // =========================
+
+    categoryForm.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            const name =
+                categoryName.value.trim();
+
+
+            if (!name) {
+
+                return;
+
+            }
+
+
+            try {
+
+                formMessage.textContent =
+                    "Saving category...";
+
+
+                await addDoc(
+                    collection(
+                        db,
+                        "categories"
+                    ),
+                    {
+
+                        name: name,
+
+                        createdAt:
+                            serverTimestamp(),
+
+                        updatedAt:
+                            serverTimestamp()
+
+                    }
+                );
+
+
+                formMessage.textContent =
+                    "Category added successfully!";
+
+
+                categoryForm.reset();
+
+
+                loadCategories();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                formMessage.textContent =
+                    "Unable to save category.";
+
+            }
+
+        }
+    );
+
+
+
+    // =========================
+    // START
+    // =========================
+
+    loadCategories();
+
+</script>
+
+
+</body>
+
+</html>
