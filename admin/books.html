@@ -102,8 +102,13 @@
         } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
         import {
+            auth,
             db
         } from "../js/firebase-config.js";
+
+        import {
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
         const booksList =
@@ -309,7 +314,22 @@
         }
 
 
-        loadBooks();
+        onAuthStateChanged(auth, (user) => {
+
+    if (!user) {
+
+        booksList.innerHTML = `
+            <p>
+                You must be logged in to access the admin area.
+            </p>
+        `;
+
+        return;
+    }
+
+    loadBooks();
+
+});
 
     </script>
     <script
