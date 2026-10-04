@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Chapters | Bookeyz Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ADMIN NAVBAR -->
+
+    <header class="admin-navbar">
+
+        <div class="admin-logo">
+            BOOKEYZ ADMIN
+        </div>
+
+        <nav>
+
+            <a href="index.html">
+                Dashboard
+            </a>
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a
+                href="chapters.html"
+                class="active"
+            >
+                Chapters
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- PAGE -->
+
+    <main class="admin-page">
+
+
+        <div class="admin-page-header">
+
+            <div>
+
+                <h1>
+                    Chapters
+                </h1>
+
+                <p>
+                    Manage chapters for your books.
+                </p>
+
+            </div>
+
+
+            <button
+                class="admin-button"
+                id="addChapterButton"
+            >
+                + Add Chapter
+            </button>
+
+        </div>
+
+
+
+        <!-- BOOK SELECTOR -->
+
+        <section class="admin-card">
+
+            <div class="form-row">
+
+                <label for="bookSelect">
+                    Select Book
+                </label>
+
+                <select id="bookSelect">
+
+                    <option value="">
+                        Loading books...
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- CHAPTER LIST -->
+
+        <section class="admin-card">
+
+            <div id="chaptersList">
+
+                <p>
+                    Select a book to view its chapters.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <script type="module">
+
+        import {
+            collection,
+            getDocs,
+            query,
+            orderBy,
+            where
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+        import {
+            db
+        } from "../js/firebase-config.js";
+
+
+
+        // =========================
+        // ELEMENTS
+        // =========================
+
+        const bookSelect =
+            document.getElementById(
+                "bookSelect"
+            );
+
+
+        const chaptersList =
+            document.getElementById(
+                "chaptersList"
+            );
+
+
+        const addChapterButton =
+            document.getElementById(
+                "addChapterButton"
+            );
+
+
+
+        // =========================
+        // LOAD BOOKS
+        // =========================
+
+        async function loadBooks() {
+
+            try {
+
+                const booksSnapshot =
+                    await getDocs(
+                        collection(
+                            db,
+                            "books"
+                        )
+                    );
+
+
+                bookSelect.innerHTML = `
+                    <option value="">
+                        Select a book
+                    </option>
+                `;
+
+
+                booksSnapshot.forEach(
+                    (documentSnapshot) => {
+
+                        const book =
+                            documentSnapshot.data();
+
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+
+                        option.value =
+                            documentSnapshot.id;
+
+
+                        option.textContent =
+                            book.title ||
+                            "Untitled Book";
+
+
+                        bookSelect.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                bookSelect.innerHTML = `
+                    <option value="">
+                        Unable to load books
+                    </option>
+                `;
+
+            }
+
+        }
+
+
+
+        // =========================
+        // LOAD CHAPTERS
+        // =========================
+
+        async function loadChapters(bookId) {
+
+            if (!bookId) {
+
+                chaptersList.innerHTML = `
+                    <p>
+                        Select a book to view its chapters.
+                    </p>
+                `;
+
+                return;
+
+            }
+
+
+            try {
+
+                const chaptersQuery =
+                    query(
+                        collection(
+                            db,
+                            "chapters"
+                        ),
+
+                        where(
+                            "bookId",
+                            "==",
+                            bookId
+                        ),
+
+                        orderBy(
+                            "number",
+                            "asc"
+                        )
+                    );
+
+
+                const chaptersSnapshot =
+                    await getDocs(
+                        chaptersQuery
+                    );
+
+
+                if (chaptersSnapshot.empty) {
+
+                    chaptersList.innerHTML = `
+                        <p>
+                            This book has no chapters yet.
+                        </p>
+                    `;
+
+                    return;
+
+                }
+
+
+                chaptersList.innerHTML = "";
+
+
+                chaptersSnapshot.forEach(
+                    (documentSnapshot) => {
+
+                        const chapter =
+                            documentSnapshot.data();
+
+
+                        const chapterElement =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        chapterElement.className =
+                            "admin-book-row";
+
+
+                        chapterElement.innerHTML = `
+
+                            <div class="admin-book-info">
+
+                                <h3>
+                                    Chapter
+                                    ${chapter.number || ""}
+                                </h3>
+
+                                <p>
+                                    ${chapter.title || "Untitled Chapter"}
+                                </p>
+
+                            </div>
+
+
+                            <div class="admin-book-meta">
+
+                                <span>
+                                    ${chapter.language || "English"}
+                                </span>
+
+                                <span>
+                                    ${chapter.status || "Draft"}
+                                </span>
+
+                            </div>
+
+                        `;
+
+
+                        chaptersList.appendChild(
+                            chapterElement
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                chaptersList.innerHTML = `
+                    <p>
+                        Unable to load chapters.
+                    </p>
+                `;
+
+            }
+
+        }
+
+
+
+        // =========================
+        // BOOK SELECT CHANGE
+        // =========================
+
+        bookSelect.addEventListener(
+            "change",
+            () => {
+
+                loadChapters(
+                    bookSelect.value
+                );
+
+            }
+        );
+
+
+
+        // =========================
+        // ADD CHAPTER
+        // =========================
+
+        addChapterButton.addEventListener(
+            "click",
+            () => {
+
+                const bookId =
+                    bookSelect.value;
+
+
+                if (!bookId) {
+
+                    alert(
+                        "Please select a book first."
+                    );
+
+                    return;
+
+                }
+
+
+                window.location.href =
+                    `add-chapter.html?book=${bookId}`;
+
+            }
+        );
+
+
+
+        // =========================
+        // START
+        // =========================
+
+        loadBooks();
+
+    </script>
+
+
+</body>
+
+</html>

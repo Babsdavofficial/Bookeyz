@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Add Chapter | Bookeyz Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ADMIN NAVBAR -->
+
+    <header class="admin-navbar">
+
+        <div class="admin-logo">
+            BOOKEYZ ADMIN
+        </div>
+
+        <nav>
+
+            <a href="index.html">
+                Dashboard
+            </a>
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a
+                href="chapters.html"
+                class="active"
+            >
+                Chapters
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- PAGE -->
+
+    <main class="admin-page">
+
+
+        <div class="admin-page-header">
+
+            <div>
+
+                <h1>
+                    Add Chapter
+                </h1>
+
+                <p>
+                    Add a new chapter to your book.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <section class="admin-card">
+
+
+            <form id="addChapterForm">
+
+
+                <!-- CHAPTER NUMBER -->
+
+                <div class="form-row">
+
+                    <label for="chapterNumber">
+                        Chapter Number
+                    </label>
+
+                    <input
+                        type="number"
+                        id="chapterNumber"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- LANGUAGE -->
+
+                <div class="form-row">
+
+                    <label for="language">
+                        Language
+                    </label>
+
+                    <select
+                        id="language"
+                        required
+                    >
+
+                        <option value="English">
+                            English
+                        </option>
+
+                        <option value="French">
+                            French
+                        </option>
+
+                        <option value="Spanish">
+                            Spanish
+                        </option>
+
+                        <option value="Arabic">
+                            Arabic
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- ORIGINAL -->
+
+                <div class="form-row">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            id="isOriginal"
+                        >
+
+                        This is the original version
+
+                    </label>
+
+                </div>
+
+
+
+                <!-- TITLE -->
+
+                <div class="form-row">
+
+                    <label for="chapterTitle">
+                        Chapter Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="chapterTitle"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- CONTENT -->
+
+                <div class="form-row">
+
+                    <label for="chapterContent">
+                        Chapter Content
+                    </label>
+
+                    <textarea
+                        id="chapterContent"
+                        rows="20"
+                        placeholder="Write or paste the chapter content here..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- ARTWORK -->
+
+                <h2>
+                    Artwork
+                </h2>
+
+
+                <div class="form-row">
+
+                    <label for="artwork">
+                        Artwork
+                    </label>
+
+                    <input
+                        type="text"
+                        id="artwork"
+                        placeholder="Image URL"
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="backgroundImage">
+                        Background Image
+                    </label>
+
+                    <input
+                        type="text"
+                        id="backgroundImage"
+                        placeholder="Image URL"
+                    >
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <h2>
+                    Publishing
+                </h2>
+
+
+                <div class="form-row">
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="chapterStatus"
+                            value="draft"
+                            checked
+                        >
+
+                        Draft
+
+                    </label>
+
+
+                    <label>
+
+                        <input
+                            type="radio"
+                            name="chapterStatus"
+                            value="published"
+                        >
+
+                        Published
+
+                    </label>
+
+                </div>
+
+
+
+                <!-- BUTTON -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="admin-button"
+                    >
+                        Save Chapter
+                    </button>
+
+                </div>
+
+
+                <p id="formMessage"></p>
+
+
+            </form>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <script type="module">
+
+
+        import {
+            collection,
+            addDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+        import {
+            auth,
+            db
+        } from "../js/firebase-config.js";
+
+
+
+        // =========================
+        // GET BOOK ID
+        // =========================
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const bookId =
+            urlParams.get("book");
+
+
+
+        // =========================
+        // ELEMENTS
+        // =========================
+
+        const form =
+            document.getElementById(
+                "addChapterForm"
+            );
+
+
+        const formMessage =
+            document.getElementById(
+                "formMessage"
+            );
+
+
+
+        // =========================
+        // CHECK BOOK
+        // =========================
+
+        if (!bookId) {
+
+            formMessage.textContent =
+                "No book was selected.";
+
+            form.style.display =
+                "none";
+
+        }
+
+
+
+        // =========================
+        // SAVE CHAPTER
+        // =========================
+
+        form.addEventListener(
+            "submit",
+            async (event) => {
+
+                event.preventDefault();
+
+
+
+                const user =
+                    auth.currentUser;
+
+
+
+                if (!user) {
+
+                    formMessage.textContent =
+                        "You must be logged in.";
+
+                    return;
+
+                }
+
+
+
+                const selectedStatus =
+                    document.querySelector(
+                        'input[name="chapterStatus"]:checked'
+                    );
+
+
+
+                const chapterData = {
+
+                    bookId:
+                        bookId,
+
+                    number:
+                        Number(
+                            document.getElementById(
+                                "chapterNumber"
+                            ).value
+                        ),
+
+                    language:
+                        document.getElementById(
+                            "language"
+                        ).value,
+
+                    isOriginal:
+                        document.getElementById(
+                            "isOriginal"
+                        ).checked,
+
+                    title:
+                        document.getElementById(
+                            "chapterTitle"
+                        ).value.trim(),
+
+                    content:
+                        document.getElementById(
+                            "chapterContent"
+                        ).value.trim(),
+
+                    artwork:
+                        document.getElementById(
+                            "artwork"
+                        ).value.trim(),
+
+                    backgroundImage:
+                        document.getElementById(
+                            "backgroundImage"
+                        ).value.trim(),
+
+                    status:
+                        selectedStatus.value,
+
+                    readerCount:
+                        0,
+
+                    createdBy:
+                        user.uid,
+
+                    createdAt:
+                        serverTimestamp(),
+
+                    updatedAt:
+                        serverTimestamp()
+
+                };
+
+
+
+                try {
+
+                    formMessage.textContent =
+                        "Saving chapter...";
+
+
+
+                    const chapterRef =
+                        await addDoc(
+                            collection(
+                                db,
+                                "chapters"
+                            ),
+                            chapterData
+                        );
+
+
+
+                    console.log(
+                        "Chapter ID:",
+                        chapterRef.id
+                    );
+
+
+
+                    formMessage.textContent =
+                        "Chapter saved successfully!";
+
+
+
+                    form.reset();
+
+
+
+                    document.querySelector(
+                        'input[name="chapterStatus"][value="draft"]'
+                    ).checked = true;
+
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+
+
+                    formMessage.textContent =
+                        "Unable to save chapter.";
+
+                }
+
+            }
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
