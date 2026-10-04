@@ -288,20 +288,23 @@
 
 
 
-            } catch (error) {
+           } catch (error) {
 
-                console.error(error);
+    console.error("BOOKS ERROR:", error);
 
+    booksList.innerHTML = `
 
-                booksList.innerHTML = `
+        <p style="color: red;">
+            Error loading books.
+        </p>
 
-                    <p>
-                        Unable to load books.
-                    </p>
+        <p>
+            ${error.message}
+        </p>
 
-                `;
+    `;
 
-            }
+}
 
         }
 
