@@ -87,7 +87,9 @@
             collection,
             getDocs,
             query,
-            orderBy
+            orderBy,
+            doc,
+            deleteDoc
         } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
         import {
@@ -202,8 +204,79 @@
 
 
                     booksList.appendChild(bookElement);
+                    // =========================
+                    // EDIT BOOK
+                    // =========================
+
+                    const editButton =
+                        bookElement.querySelector(
+                            'button:not(.delete-book)'
+                        );
+
+
+                    editButton.addEventListener("click", () => {
+
+                        window.location.href =
+                            `edit-book.html?id=${bookId}`;
+
+                    });
 
                 });
+
+                // =========================
+            // DELETE BOOK
+            // =========================
+
+            const deleteButtons =
+                document.querySelectorAll(".delete-book");
+
+
+            deleteButtons.forEach((button) => {
+
+                button.addEventListener("click", async () => {
+
+                    const bookId =
+                        button.dataset.bookId;
+
+
+                    const confirmed =
+                        confirm(
+                            "Are you sure you want to delete this book?"
+                        );
+
+
+                    if (!confirmed) {
+                        return;
+                    }
+
+
+                    try {
+
+                        await deleteDoc(
+                            doc(db, "books", bookId)
+                        );
+
+
+                        alert("Book deleted successfully!");
+
+
+                        loadBooks();
+
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                        alert(
+                            "Something went wrong while deleting the book."
+                        );
+
+                    }
+
+                });
+
+            });
+
 
 
             } catch (error) {

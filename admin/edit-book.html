@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Book | Bookeyz Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ADMIN NAVBAR -->
+
+    <header class="admin-navbar">
+
+        <div class="admin-logo">
+            BOOKEYZ ADMIN
+        </div>
+
+        <nav>
+
+            <a href="index.html">
+                Dashboard
+            </a>
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a href="chapters.html">
+                Chapters
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- PAGE -->
+
+    <main class="admin-page">
+
+
+        <div class="admin-page-header">
+
+            <div>
+
+                <h1>
+                    Edit Book
+                </h1>
+
+                <p>
+                    Update the information for this book.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <section class="admin-card">
+
+
+            <form id="editBookForm">
+
+
+                <div class="form-row">
+
+                    <label for="bookTitle">
+                        Book Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="bookTitle"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="author">
+                        Author
+                    </label>
+
+                    <input
+                        type="text"
+                        id="author"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        rows="6"
+                        required
+                    ></textarea>
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="category">
+                        Category
+                    </label>
+
+                    <input
+                        type="text"
+                        id="category"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="language">
+                        Original Language
+                    </label>
+
+                    <input
+                        type="text"
+                        id="language"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="tags">
+                        Tags
+                    </label>
+
+                    <input
+                        type="text"
+                        id="tags"
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="slug">
+                        Slug
+                    </label>
+
+                    <input
+                        type="text"
+                        id="slug"
+                        required
+                    >
+
+                </div>
+
+
+
+                <h2>
+                    Artwork
+                </h2>
+
+
+                <div class="form-row">
+
+                    <label for="coverImage">
+                        Cover Image
+                    </label>
+
+                    <input
+                        type="text"
+                        id="coverImage"
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="backgroundImage">
+                        Background Image
+                    </label>
+
+                    <input
+                        type="text"
+                        id="backgroundImage"
+                    >
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="bannerImage">
+                        Banner Image
+                    </label>
+
+                    <input
+                        type="text"
+                        id="bannerImage"
+                    >
+
+                </div>
+
+
+
+                <h2>
+                    Access
+                </h2>
+
+
+                <div class="form-row">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="accessType"
+                            value="free"
+                        >
+
+                        Free
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="accessType"
+                            value="paid"
+                        >
+
+                        Paid
+                    </label>
+
+                </div>
+
+
+
+                <div class="form-row">
+
+                    <label for="price">
+                        Price (₦)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="price"
+                        min="0"
+                        step="0.01"
+                    >
+
+                </div>
+
+
+
+                <h2>
+                    Publishing
+                </h2>
+
+
+                <div class="form-row">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="bookStatus"
+                            value="draft"
+                        >
+
+                        Draft
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="bookStatus"
+                            value="published"
+                        >
+
+                        Published
+                    </label>
+
+                </div>
+
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="admin-button"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+
+                <p id="formMessage"></p>
+
+
+            </form>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <script type="module">
+
+        import {
+            doc,
+            getDoc,
+            updateDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+        import {
+            db
+        } from "../js/firebase-config.js";
+
+
+
+        // =========================
+        // GET BOOK ID
+        // =========================
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const bookId =
+            urlParams.get("id");
+
+
+
+        const form =
+            document.getElementById(
+                "editBookForm"
+            );
+
+
+        const formMessage =
+            document.getElementById(
+                "formMessage"
+            );
+
+
+
+        // =========================
+        // CHECK BOOK ID
+        // =========================
+
+        if (!bookId) {
+
+            formMessage.textContent =
+                "No book was selected.";
+
+            form.style.display = "none";
+
+        }
+
+
+
+        // =========================
+        // LOAD BOOK
+        // =========================
+
+        async function loadBook() {
+
+            try {
+
+                const bookRef =
+                    doc(
+                        db,
+                        "books",
+                        bookId
+                    );
+
+
+                const bookSnapshot =
+                    await getDoc(bookRef);
+
+
+                if (!bookSnapshot.exists()) {
+
+                    formMessage.textContent =
+                        "Book not found.";
+
+                    form.style.display =
+                        "none";
+
+                    return;
+
+                }
+
+
+                const book =
+                    bookSnapshot.data();
+
+
+
+                document.getElementById(
+                    "bookTitle"
+                ).value =
+                    book.title || "";
+
+
+
+                document.getElementById(
+                    "author"
+                ).value =
+                    book.author || "";
+
+
+
+                document.getElementById(
+                    "description"
+                ).value =
+                    book.description || "";
+
+
+
+                document.getElementById(
+                    "category"
+                ).value =
+                    book.category || "";
+
+
+
+                document.getElementById(
+                    "language"
+                ).value =
+                    book.originalLanguage || "";
+
+
+
+                document.getElementById(
+                    "tags"
+                ).value =
+                    book.tags || "";
+
+
+
+                document.getElementById(
+                    "slug"
+                ).value =
+                    book.slug || "";
+
+
+
+                document.getElementById(
+                    "coverImage"
+                ).value =
+                    book.coverImage || "";
+
+
+
+                document.getElementById(
+                    "backgroundImage"
+                ).value =
+                    book.backgroundImage || "";
+
+
+
+                document.getElementById(
+                    "bannerImage"
+                ).value =
+                    book.bannerImage || "";
+
+
+
+                const accessType =
+                    book.free
+                        ? "free"
+                        : "paid";
+
+
+                document.querySelector(
+                    `input[name="accessType"][value="${accessType}"]`
+                ).checked = true;
+
+
+
+                document.getElementById(
+                    "price"
+                ).value =
+                    book.price || "";
+
+
+
+                document.querySelector(
+                    `input[name="bookStatus"][value="${book.status}"]`
+                ).checked = true;
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                formMessage.textContent =
+                    "Unable to load this book.";
+
+            }
+
+        }
+
+
+
+        // =========================
+        // SAVE CHANGES
+        // =========================
+
+        form.addEventListener(
+            "submit",
+            async (event) => {
+
+                event.preventDefault();
+
+
+                const selectedAccess =
+                    document.querySelector(
+                        'input[name="accessType"]:checked'
+                    );
+
+
+                const selectedStatus =
+                    document.querySelector(
+                        'input[name="bookStatus"]:checked'
+                    );
+
+
+                const accessType =
+                    selectedAccess.value;
+
+
+                const status =
+                    selectedStatus.value;
+
+
+
+                const updatedBook = {
+
+                    title:
+                        document.getElementById(
+                            "bookTitle"
+                        ).value.trim(),
+
+                    author:
+                        document.getElementById(
+                            "author"
+                        ).value.trim(),
+
+                    description:
+                        document.getElementById(
+                            "description"
+                        ).value.trim(),
+
+                    category:
+                        document.getElementById(
+                            "category"
+                        ).value.trim(),
+
+                    originalLanguage:
+                        document.getElementById(
+                            "language"
+                        ).value.trim(),
+
+                    tags:
+                        document.getElementById(
+                            "tags"
+                        ).value.trim(),
+
+                    slug:
+                        document.getElementById(
+                            "slug"
+                        ).value.trim(),
+
+                    coverImage:
+                        document.getElementById(
+                            "coverImage"
+                        ).value.trim(),
+
+                    backgroundImage:
+                        document.getElementById(
+                            "backgroundImage"
+                        ).value.trim(),
+
+                    bannerImage:
+                        document.getElementById(
+                            "bannerImage"
+                        ).value.trim(),
+
+                    free:
+                        accessType === "free",
+
+                    price:
+                        accessType === "paid"
+                            ? Number(
+                                document.getElementById(
+                                    "price"
+                                ).value
+                            )
+                            : 0,
+
+                    status:
+                        status,
+
+                    updatedAt:
+                        serverTimestamp()
+
+                };
+
+
+
+                try {
+
+                    formMessage.textContent =
+                        "Saving changes...";
+
+
+                    await updateDoc(
+
+                        doc(
+                            db,
+                            "books",
+                            bookId
+                        ),
+
+                        updatedBook
+
+                    );
+
+
+                    formMessage.textContent =
+                        "Book updated successfully!";
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    formMessage.textContent =
+                        "Unable to update the book.";
+
+                }
+
+            }
+        );
+
+
+
+        // Load the book
+
+        if (bookId) {
+
+            loadBook();
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
