@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Categories — Bookeyz</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css">
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+
+        <a
+            href="../index.html"
+            class="logo">
+
+            Bookeyz
+
+        </a>
+
+
+        <nav>
+
+            <a href="../index.html">
+                Home
+            </a>
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a href="categories.html">
+                Categories
+            </a>
+
+            <a href="login.html">
+                Login
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- Page Header -->
+    <section class="page-header">
+
+        <p class="section-label">
+            EXPLORE
+        </p>
+
+        <h1>
+            Categories
+        </h1>
+
+        <p>
+            Explore stories by category.
+        </p>
+
+    </section>
+
+
+    <!-- Categories -->
+    <main>
+
+        <section class="section">
+
+            <div
+                id="categoriesList"
+                class="category-grid">
+
+                <p>
+                    Loading categories...
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+
+        <div class="footer-logo">
+            Bookeyz
+        </div>
+
+        <p>
+            Stories worth getting lost in.
+        </p>
+
+        <p class="copyright">
+            © 2026 Bookeyz
+        </p>
+
+    </footer>
+
+
+    <!-- Firebase -->
+    <script type="module">
+
+        import {
+            collection,
+            getDocs,
+            query,
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+        import {
+            db
+        } from "../js/firebase-config.js";
+
+
+        const categoriesList =
+            document.getElementById(
+                "categoriesList"
+            );
+
+
+        async function loadCategories() {
+
+            try {
+
+                const categoriesQuery =
+                    query(
+                        collection(
+                            db,
+                            "categories"
+                        ),
+                        orderBy(
+                            "name",
+                            "asc"
+                        )
+                    );
+
+
+                const categoriesSnapshot =
+                    await getDocs(
+                        categoriesQuery
+                    );
+
+
+                if (
+                    categoriesSnapshot.empty
+                ) {
+
+                    categoriesList.innerHTML = `
+
+                        <p>
+                            No categories available yet.
+                        </p>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                categoriesList.innerHTML = "";
+
+
+                categoriesSnapshot.forEach(
+                    (documentSnapshot) => {
+
+                        const category =
+                            documentSnapshot.data();
+
+
+                        const categoryName =
+                            category.name;
+
+
+                        const categoryCard =
+                            document.createElement(
+                                "a"
+                            );
+
+
+                        categoryCard.href =
+                            `books.html?category=${encodeURIComponent(categoryName)}`;
+
+
+                        categoryCard.className =
+                            "category-card";
+
+
+                        categoryCard.textContent =
+                            categoryName;
+
+
+                        categoriesList.appendChild(
+                            categoryCard
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "CATEGORIES ERROR:",
+                    error
+                );
+
+
+                categoriesList.innerHTML = `
+
+                    <p>
+                        Unable to load categories.
+                    </p>
+
+                `;
+
+            }
+
+        }
+
+
+        loadCategories();
+
+    </script>
+
+</body>
+
+</html>

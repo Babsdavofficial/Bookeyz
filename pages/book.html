@@ -5,12 +5,14 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
+    <meta
+        name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>Beast World — Bookeyz</title>
+    <title>Book — Bookeyz</title>
 
-    <link rel="stylesheet"
+    <link
+        rel="stylesheet"
         href="../css/style.css">
 
 </head>
@@ -18,12 +20,20 @@
 
 <body>
 
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+
     <header class="navbar">
 
-        <a href="../index.html"
+        <a
+            href="../index.html"
             class="logo">
+
             Bookeyz
+
         </a>
+
 
         <nav>
 
@@ -35,7 +45,7 @@
                 Books
             </a>
 
-            <a href="#">
+            <a href="categories.html">
                 Categories
             </a>
 
@@ -48,57 +58,73 @@
     </header>
 
 
+    <!-- =========================
+         BOOK DETAILS
+    ========================== -->
+
     <main>
 
         <section class="book-detail">
 
+            <!-- COVER -->
+
             <div class="book-detail-cover">
 
-                <div class="cover-placeholder">
-                    BW
+                <div
+                    id="bookCover"
+                    class="cover-placeholder">
+
+                    BK
+
                 </div>
 
             </div>
 
 
+            <!-- BOOK INFORMATION -->
+
             <div class="book-detail-content">
 
-                <p class="book-category">
-                    Fantasy
+                <p
+                    id="bookCategory"
+                    class="book-category">
+
+                    Loading...
+
                 </p>
 
-                <h1>
-                    Beast World:
-                    The Fire Dragon Quest
+
+                <h1 id="bookTitle">
+
+                    Loading book...
+
                 </h1>
 
-                <p class="book-author">
-                    By Bookeyz
-                </p>
 
-                <p class="book-description">
+                <p
+                    id="bookAuthor"
+                    class="book-author">
 
-                    A world divided between powerful kingdoms,
-                    ancient guardians, and mysterious forces.
-
-                    When the Fire Dragon returns,
-                    the balance of the kingdoms begins to change.
+                    Loading author...
 
                 </p>
 
 
-                <div class="book-stats">
+                <p
+                    id="bookDescription"
+                    class="book-description">
+
+                    Loading description...
+
+                </p>
+
+
+                <div
+                    id="bookStats"
+                    class="book-stats">
 
                     <span>
-                        ★ 4.8
-                    </span>
-
-                    <span>
-                        9 Chapters
-                    </span>
-
-                    <span>
-                        Free
+                        Loading...
                     </span>
 
                 </div>
@@ -106,14 +132,19 @@
 
                 <div class="book-actions">
 
-                    <a href="reader.html"
+                    <a
+                        href="#"
+                        id="startReading"
                         class="primary-button">
 
                         Start Reading
 
                     </a>
 
-                    <button class="secondary-button">
+
+                    <button
+                        type="button"
+                        class="secondary-button">
 
                         Save Book
 
@@ -125,6 +156,10 @@
 
         </section>
 
+
+        <!-- =========================
+             CHAPTERS
+        ========================== -->
 
         <section class="section">
 
@@ -145,132 +180,13 @@
             </div>
 
 
-            <div class="chapter-list">
+            <div
+                class="chapter-list"
+                id="chapterList">
 
-                <a href="reader.html?book=beast-world&chapter=1"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 1
-                    </span>
-
-                    <strong>
-                        The Festival Before the Storm
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 2
-                    </span>
-
-                    <strong>
-                        The First Flames
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 3
-                    </span>
-
-                    <strong>
-                        The Fire Dragon's Warning
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 4
-                    </span>
-
-                    <strong>
-                        Shadow Over Ember Kingdom
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 5
-                    </span>
-
-                    <strong>
-                        The March Into Ashes
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 6
-                    </span>
-
-                    <strong>
-                        Chapter Six
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 7
-                    </span>
-
-                    <strong>
-                        The Return and the Flame Within
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 8
-                    </span>
-
-                    <strong>
-                        Shadows of the Past
-                    </strong>
-
-                </a>
-
-
-                <a href="reader.html"
-                    class="chapter-item">
-
-                    <span>
-                        Chapter 9
-                    </span>
-
-                    <strong>
-                        The Lock and the Worthy Blade
-                    </strong>
-
-                </a>
+                <p>
+                    Loading chapters...
+                </p>
 
             </div>
 
@@ -278,6 +194,10 @@
 
     </main>
 
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
 
     <footer class="footer">
 
@@ -290,6 +210,362 @@
         </p>
 
     </footer>
+
+
+    <!-- =========================
+         FIREBASE
+    ========================== -->
+
+    <script type="module">
+
+        import {
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+        import {
+            db
+        } from "../js/firebase-config.js";
+
+
+        // =========================
+        // GET BOOK ID FROM URL
+        // =========================
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const bookId =
+            urlParams.get("id");
+
+
+        // =========================
+        // PAGE ELEMENTS
+        // =========================
+
+        const bookCover =
+            document.getElementById(
+                "bookCover"
+            );
+
+
+        const bookCategory =
+            document.getElementById(
+                "bookCategory"
+            );
+
+
+        const bookTitle =
+            document.getElementById(
+                "bookTitle"
+            );
+
+
+        const bookAuthor =
+            document.getElementById(
+                "bookAuthor"
+            );
+
+
+        const bookDescription =
+            document.getElementById(
+                "bookDescription"
+            );
+
+
+        const bookStats =
+            document.getElementById(
+                "bookStats"
+            );
+
+
+        const startReading =
+            document.getElementById(
+                "startReading"
+            );
+
+
+        const chapterList =
+            document.getElementById(
+                "chapterList"
+            );
+
+
+        // =========================
+        // LOAD BOOK
+        // =========================
+
+        async function loadBook() {
+
+            if (!bookId) {
+
+                showError(
+                    "No book was selected."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                const bookReference =
+                    doc(
+                        db,
+                        "books",
+                        bookId
+                    );
+
+
+                const bookSnapshot =
+                    await getDoc(
+                        bookReference
+                    );
+
+
+                if (!bookSnapshot.exists()) {
+
+                    showError(
+                        "This book could not be found."
+                    );
+
+                    return;
+
+                }
+
+
+                const book =
+                    bookSnapshot.data();
+
+
+                // =========================
+                // BOOK INFORMATION
+                // =========================
+
+                document.title =
+                    `${book.title || "Book"} — Bookeyz`;
+
+
+                bookCategory.textContent =
+                    book.category ||
+                    "Uncategorized";
+
+
+                bookTitle.textContent =
+                    book.title ||
+                    "Untitled Book";
+
+
+                bookAuthor.textContent =
+                    `By ${book.author || "Unknown Author"}`;
+
+
+                bookDescription.textContent =
+                    book.description ||
+                    "No description available.";
+
+
+                // =========================
+                // COVER
+                // =========================
+
+                if (book.coverImage) {
+
+                    bookCover.innerHTML = `
+
+                        <img
+                            src="${book.coverImage}"
+                            alt="${book.title || "Book"} cover"
+                            style="
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                                border-radius: 10px;
+                            "
+                        >
+
+                    `;
+
+                } else {
+
+                    bookCover.textContent =
+                        getInitials(
+                            book.title
+                        );
+
+                }
+
+
+                // =========================
+                // BOOK STATS
+                // =========================
+
+                const rating =
+                    book.ratingAverage;
+
+
+                const chapterCount =
+                    book.chapterCount || 0;
+
+
+                const isFree =
+                    book.free === true;
+
+
+                bookStats.innerHTML = `
+
+                    <span>
+                        ★ ${rating || "New"}
+                    </span>
+
+                    <span>
+                        ${chapterCount} Chapters
+                    </span>
+
+                    <span>
+                        ${isFree ? "Free" : "Paid"}
+                    </span>
+
+                `;
+
+
+                // =========================
+                // START READING
+                // =========================
+
+                startReading.href =
+                    `reader.html?book=${bookId}&chapter=1`;
+
+
+                // =========================
+                // LOAD CHAPTERS
+                // =========================
+
+                loadChapters(
+                    bookId
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "BOOK DETAILS ERROR:",
+                    error
+                );
+
+
+                showError(
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        // =========================
+        // LOAD CHAPTERS
+        // =========================
+
+        async function loadChapters(
+            bookId
+        ) {
+
+            /*
+             * Chapters will be connected
+             * properly in Stage 9.
+             *
+             * For now we keep the
+             * existing chapter area
+             * as a placeholder.
+             */
+
+            chapterList.innerHTML = `
+
+                <p>
+                    Chapters will appear here
+                    when the reader is connected
+                    to Firestore.
+                </p>
+
+            `;
+
+        }
+
+
+        // =========================
+        // ERROR MESSAGE
+        // =========================
+
+        function showError(
+            message
+        ) {
+
+            bookTitle.textContent =
+                "Unable to load book";
+
+
+            bookDescription.textContent =
+                message;
+
+
+            chapterList.innerHTML = "";
+
+        }
+
+
+        // =========================
+        // INITIALS
+        // =========================
+
+        function getInitials(
+            title
+        ) {
+
+            if (!title) {
+
+                return "BK";
+
+            }
+
+
+            const words =
+                title
+                    .trim()
+                    .split(/\s+/);
+
+
+            if (
+                words.length === 1
+            ) {
+
+                return words[0]
+                    .substring(0, 2)
+                    .toUpperCase();
+
+            }
+
+
+            return (
+                words[0][0] +
+                words[1][0]
+            ).toUpperCase();
+
+        }
+
+
+        // =========================
+        // START
+        // =========================
+
+        loadBook();
+
+    </script>
 
 </body>
 
