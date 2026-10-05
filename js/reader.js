@@ -94,6 +94,7 @@ const artworkPlaceholder =
     document.querySelector(
         ".artwork-placeholder"
     );
+    const readerBack = document.getElementById("readerBack");
 
 
 /* =========================
@@ -233,6 +234,9 @@ async function loadBook() {
     readerCategory.textContent =
         book.category ||
         "Uncategorized";
+    if (readerBack) {
+    readerBack.href = `book.html?id=${bookId}`;
+}
 
 
     /* =========================

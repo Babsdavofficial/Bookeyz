@@ -477,31 +477,33 @@
 
     try {
 
-        const chaptersQuery =
-            query(
-                collection(
-                    db,
-                    "chapters"
-                ),
+       const chaptersQuery =
+    query(
+        collection(db, "chapters"),
 
-                where(
-                    "bookId",
-                    "==",
-                    bookId
-                ),
+        where(
+            "bookId",
+            "==",
+            bookId
+        ),
 
-                where(
-                    "status",
-                    "==",
-                    "published"
-                ),
+        where(
+            "status",
+            "==",
+            "published"
+        ),
 
-                orderBy(
-                    "number",
-                    "asc"
-                )
-            );
+        where(
+            "isOriginal",
+            "==",
+            true
+        ),
 
+        orderBy(
+            "number",
+            "asc"
+        )
+    );
 
         const chaptersSnapshot =
             await getDocs(
