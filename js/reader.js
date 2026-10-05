@@ -713,17 +713,36 @@ function renderArtwork() {
 }
 
 
+
 /* =========================
    CHAPTER NAVIGATION
 ========================= */
 
 function setupNavigation() {
 
+    const selectedLanguage =
+        currentChapter.language ||
+        urlParams.get("lang") ||
+        "en";
+
+    // Only navigate through chapters
+    // belonging to the current language.
+    const languageChapters =
+        chapters
+            .filter(
+                (chapter) =>
+                    chapter.language === selectedLanguage
+            )
+            .sort(
+                (a, b) =>
+                    Number(a.number) -
+                    Number(b.number)
+            );
+
     const currentIndex =
-        chapters.findIndex(
+        languageChapters.findIndex(
             (chapter) =>
-                chapter.id ===
-                currentChapter.id
+                chapter.id === currentChapter.id
         );
 
 
@@ -731,17 +750,15 @@ function setupNavigation() {
        PREVIOUS
     ========================= */
 
-    if (
-        currentIndex > 0
-    ) {
+    if (currentIndex > 0) {
 
         const previous =
-            chapters[
+            languageChapters[
                 currentIndex - 1
             ];
 
         previousChapter.href =
-            `reader.html?book=${bookId}&chapter=${previous.number}`;
+            `reader.html?book=${bookId}&chapter=${previous.number}&lang=${selectedLanguage}`;
 
         previousChapter.classList.remove(
             "disabled"
@@ -765,17 +782,18 @@ function setupNavigation() {
     ========================= */
 
     if (
+        currentIndex >= 0 &&
         currentIndex <
-        chapters.length - 1
+            languageChapters.length - 1
     ) {
 
         const next =
-            chapters[
+            languageChapters[
                 currentIndex + 1
             ];
 
         nextChapter.href =
-            `reader.html?book=${bookId}&chapter=${next.number}`;
+            `reader.html?book=${bookId}&chapter=${next.number}&lang=${selectedLanguage}`;
 
         nextChapter.classList.remove(
             "disabled"
