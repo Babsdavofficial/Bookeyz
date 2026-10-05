@@ -433,8 +433,42 @@ function renderReader() {
 
 
 
+ 
+
     /* =========================
-   SAVE READING PROGRESS
+       ARTWORK
+    ========================= */
+
+    renderArtwork();
+
+
+    /* =========================
+       CHAPTER NAVIGATION
+    ========================= */
+
+    setupNavigation();
+
+
+    /* =========================
+       RESET SCROLL
+    ========================= */
+
+    window.scrollTo(
+        0,
+        0
+    );
+
+    updateReadingProgress();
+
+loadReadingProgress();
+
+}
+
+
+
+
+/* =========================
+   LOAD READING PROGRESS
 ========================= */
 
 async function loadReadingProgress() {
@@ -462,7 +496,6 @@ async function loadReadingProgress() {
                 )
             );
 
-
         const snapshot =
             await getDocs(progressQuery);
 
@@ -489,9 +522,12 @@ async function loadReadingProgress() {
         );
 
     }
-
 }
 
+
+/* =========================
+   SAVE READING PROGRESS
+========================= */
 
 async function saveReadingProgress() {
 
@@ -528,11 +564,6 @@ async function saveReadingProgress() {
 
     }
 
-
-    /*
-       Don't constantly write the
-       same percentage to Firestore.
-    */
 
     if (
         progress === lastSavedProgress
@@ -610,35 +641,6 @@ async function saveReadingProgress() {
         );
 
     }
-
-}
-
-    /* =========================
-       ARTWORK
-    ========================= */
-
-    renderArtwork();
-
-
-    /* =========================
-       CHAPTER NAVIGATION
-    ========================= */
-
-    setupNavigation();
-
-
-    /* =========================
-       RESET SCROLL
-    ========================= */
-
-    window.scrollTo(
-        0,
-        0
-    );
-
-    updateReadingProgress();
-
-loadReadingProgress();
 
 }
 
