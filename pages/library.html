@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Library - Bookeyz</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <a href="../index.html" class="logo">
+            Bookeyz
+        </a>
+
+        <div class="nav-links">
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a href="../index.html#categories">
+                Categories
+            </a>
+
+            <a href="library.html">
+                My Library
+            </a>
+
+            <a href="login.html" id="loginLink">
+                Login
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="container">
+
+        <section class="page-header">
+
+            <h1>
+                My Library
+            </h1>
+
+            <p>
+                Books you've saved.
+            </p>
+
+        </section>
+
+
+        <section id="libraryMessage">
+
+            <p>
+                Loading your library...
+            </p>
+
+        </section>
+
+
+        <section
+            id="libraryGrid"
+            class="book-grid">
+        </section>
+
+    </main>
+
+
+    <script type="module">
+
+        import {
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+        import {
+            collection,
+            getDocs,
+            query,
+            where,
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+        import {
+            auth,
+            db
+        } from "../js/firebase-config.js";
+
+
+        const libraryGrid =
+            document.getElementById("libraryGrid");
+
+        const libraryMessage =
+            document.getElementById("libraryMessage");
+
+
+        onAuthStateChanged(auth, async (user) => {
+
+            if (!user) {
+
+                libraryMessage.innerHTML = `
+                    <p>
+                        Please log in to view your library.
+                    </p>
+
+                    <a href="login.html">
+                        Log in
+                    </a>
+                `;
+
+                return;
+            }
+
+
+            await loadLibrary(user.uid);
+
+        });
+
+
+        async function loadLibrary(userId) {
+
+            try {
+
+                const savedBooksQuery =
+                    query(
+                        collection(db, "savedBooks"),
+
+                        where(
+                            "userId",
+                            "==",
+                            userId
+                        )
+                    );
+
+
+                const savedBooksSnapshot =
+                    await getDocs(
+                        savedBooksQuery
+                    );
+
+
+                if (savedBooksSnapshot.empty) {
+
+                    libraryMessage.innerHTML = `
+                        <p>
+                            You haven't saved any books yet.
+                        </p>
+                    `;
+
+                    return;
+                }
+
+
+                libraryMessage.innerHTML = "";
+
+
+                for (
+                    const savedBookDocument
+                    of savedBooksSnapshot.docs
+                ) {
+
+                    const savedBook =
+                        savedBookDocument.data();
+
+
+                    const bookReference =
+                        doc(
+                            db,
+                            "books",
+                            savedBook.bookId
+                        );
+
+
+                    const bookSnapshot =
+                        await getDoc(
+                            bookReference
+                        );
+
+
+                    if (!bookSnapshot.exists()) {
+                        continue;
+                    }
+
+
+                    const book =
+                        bookSnapshot.data();
+
+
+                    if (book.status !== "published") {
+                        continue;
+                    }
+
+
+                    const bookCard =
+                        document.createElement("article");
+
+                    bookCard.className =
+                        "book-card";
+
+
+                    bookCard.innerHTML = `
+
+                        <a href="book.html?id=${bookSnapshot.id}">
+
+                            <div class="book-cover">
+
+                                ${
+                                    book.coverImage
+                                    ?
+                                    `<img
+                                        src="${book.coverImage}"
+                                        alt="${book.title}"
+                                    >`
+                                    :
+                                    `<div class="book-cover-placeholder">
+                                        No Cover
+                                    </div>`
+                                }
+
+                            </div>
+
+
+                            <div class="book-card-content">
+
+                                <h3>
+                                    ${book.title || "Untitled"}
+                                </h3>
+
+                                <p>
+                                    ${book.author || "Unknown Author"}
+                                </p>
+
+                            </div>
+
+                        </a>
+
+                    `;
+
+
+                    libraryGrid.appendChild(
+                        bookCard
+                    );
+                }
+
+
+                if (!libraryGrid.children.length) {
+
+                    libraryMessage.innerHTML = `
+                        <p>
+                            You haven't saved any published books yet.
+                        </p>
+                    `;
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "LIBRARY ERROR:",
+                    error
+                );
+
+                libraryMessage.innerHTML = `
+                    <p>
+                        Unable to load your library right now.
+                    </p>
+                `;
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>
