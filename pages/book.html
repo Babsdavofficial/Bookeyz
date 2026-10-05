@@ -523,6 +523,7 @@ document.getElementById(
                 loadChapters(
                     bookId
                 );
+                loadBookRating();
 
 
             } catch (error) {
@@ -957,75 +958,37 @@ function highlightRating(
 // RECALCULATE BOOK RATING
 // -------------------------
 
-async function recalculateBookRating() {
+async function loadBookRating() {
+
+    if (!bookId) {
+        return;
+    }
 
     try {
 
-        const ratingsQuery =
-            query(
-                collection(
-                    db,
-                    "ratings"
-                ),
-
-                where(
-                    "bookId",
-                    "==",
-                    bookId
-                )
-            );
-
-        const snapshot =
-            await getDocs(
-                ratingsQuery
-            );
-
-        const ratingCountValue =
-            snapshot.size;
-
-        let total =
-            0;
-
-        snapshot.forEach(
-            (ratingDocument) => {
-
-                total +=
-                    Number(
-                        ratingDocument.data().rating
-                    );
-
-            }
+        const ratingsQuery = query(
+            collection(db, "ratings"),
+            where("bookId", "==", bookId)
         );
+
+        const snapshot = await getDocs(ratingsQuery);
+
+        const ratingCountValue = snapshot.size;
+
+        let total = 0;
+
+        snapshot.forEach((ratingDocument) => {
+
+            const ratingData = ratingDocument.data();
+
+            total += Number(ratingData.rating || 0);
+
+        });
 
         const average =
             ratingCountValue > 0
                 ? total / ratingCountValue
                 : 0;
-
-
-        await updateDoc(
-
-            doc(
-                db,
-                "books",
-                bookId
-            ),
-
-            {
-                ratingAverage:
-                    Number(
-                        average.toFixed(1)
-                    ),
-
-                ratingCount:
-                    ratingCountValue,
-
-                updatedAt:
-                    new Date()
-            }
-
-        );
-
 
         bookRating.textContent =
             average > 0
@@ -1042,7 +1005,7 @@ async function recalculateBookRating() {
     } catch (error) {
 
         console.error(
-            "RECALCULATE RATING ERROR:",
+            "LOAD BOOK RATING ERROR:",
             error
         );
 
