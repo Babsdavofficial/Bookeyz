@@ -2,27 +2,53 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Books — Bookeyz</title>
 
-    <link rel="stylesheet" href="../css/style.css">
+    <link
+        rel="stylesheet"
+        href="../css/style.css">
+
 </head>
+
 
 <body>
 
     <header class="navbar">
 
-        <a href="../index.html" class="logo">
+        <a
+            href="../index.html"
+            class="logo">
+
             Bookeyz
+
         </a>
 
+
         <nav>
-            <a href="../index.html">Home</a>
-            <a href="books.html">Books</a>
-            <a href="categories.html">Categories</a>
-            <a href="login.html">Login</a>
+
+            <a href="../index.html">
+                Home
+            </a>
+
+            <a href="books.html">
+                Books
+            </a>
+
+            <a href="categories.html">
+                Categories
+            </a>
+
+            <a href="login.html">
+                Login
+            </a>
+
         </nav>
 
     </header>
@@ -32,17 +58,27 @@
 
         <section class="page-header">
 
-            <p class="section-label" id="pageLabel">
+            <p
+                class="section-label"
+                id="pageLabel">
+
                 EXPLORE BOOKEYZ
+
             </p>
 
+
             <h1 id="pageTitle">
+
                 All Books
+
             </h1>
 
+
             <p id="pageDescription">
+
                 Explore stories across different worlds,
                 genres, and adventures.
+
             </p>
 
         </section>
@@ -52,10 +88,9 @@
 
             <div
                 class="book-grid"
-                id="booksGrid"
-            >
+                id="booksGrid">
 
-                <p id="loadingMessage">
+                <p>
                     Loading books...
                 </p>
 
@@ -101,6 +136,12 @@
             );
 
 
+        const pageLabel =
+            document.getElementById(
+                "pageLabel"
+            );
+
+
         const pageTitle =
             document.getElementById(
                 "pageTitle"
@@ -114,11 +155,15 @@
 
 
         /*
-         * Read the category from the URL.
+         * Read information from the URL.
          *
-         * Example:
+         * Examples:
+         *
+         * books.html
          *
          * books.html?category=Fantasy
+         *
+         * books.html?search=dragon
          */
 
         const urlParams =
@@ -128,206 +173,65 @@
 
 
         const selectedCategory =
-            urlParams.get("category");
+            urlParams.get(
+                "category"
+            );
+
+
+        const searchTerm =
+            urlParams.get(
+                "search"
+            );
 
 
         async function loadBooks() {
 
             try {
 
-                let booksQuery;
-
-
                 /*
-                 * If a category was selected,
-                 * only get books from that category.
+                 * CATEGORY MODE
+                 *
+                 * Example:
+                 * books.html?category=Fantasy
                  */
 
                 if (selectedCategory) {
 
-                    pageTitle.textContent =
-                        selectedCategory;
-
-
-                    pageDescription.textContent =
-                        `Explore ${selectedCategory} stories on Bookeyz.`;
-
-
-                    booksQuery =
-                        query(
-                            collection(
-                                db,
-                                "books"
-                            ),
-
-                            where(
-                                "status",
-                                "==",
-                                "published"
-                            ),
-
-                            where(
-                                "category",
-                                "==",
-                                selectedCategory
-                            ),
-
-                            orderBy(
-                                "createdAt",
-                                "desc"
-                            )
-                        );
-
-                }
-
-
-                /*
-                 * Otherwise show every
-                 * published book.
-                 */
-
-                else {
-
-                    booksQuery =
-                        query(
-                            collection(
-                                db,
-                                "books"
-                            ),
-
-                            where(
-                                "status",
-                                "==",
-                                "published"
-                            ),
-
-                            orderBy(
-                                "createdAt",
-                                "desc"
-                            )
-                        );
-
-                }
-
-
-                const snapshot =
-                    await getDocs(
-                        booksQuery
-                    );
-
-
-                booksGrid.innerHTML = "";
-
-
-                if (snapshot.empty) {
-
-                    booksGrid.innerHTML = `
-
-                        <p>
-                            No books found in
-                            ${selectedCategory || "Bookeyz"}
-                            yet.
-                        </p>
-
-                    `;
+                    await loadCategoryBooks();
 
                     return;
 
                 }
 
 
-                snapshot.forEach(
-                    (documentSnapshot) => {
+                /*
+                 * SEARCH MODE
+                 *
+                 * Example:
+                 * books.html?search=dragon
+                 */
 
-                        const book =
-                            documentSnapshot.data();
+                if (searchTerm) {
 
+                    await loadSearchResults();
 
-                        const bookId =
-                            documentSnapshot.id;
+                    return;
 
-
-                        const cover =
-                            book.coverImage;
-
-
-                        const coverContent =
-                            cover
-                                ? `
-                                    <img
-                                        src="${cover}"
-                                        alt="${book.title} cover"
-                                    >
-                                  `
-                                : `
-                                    <div class="cover-placeholder">
-                                        ${getInitials(book.title)}
-                                    </div>
-                                  `;
+                }
 
 
-                        const card =
-                            document.createElement(
-                                "article"
-                            );
+                /*
+                 * NORMAL MODE
+                 *
+                 * Show every published book.
+                 */
 
-
-                        card.className =
-                            "book-card";
-
-
-                        card.innerHTML = `
-
-                            <a
-                                href="book.html?id=${bookId}"
-                                class="book-card"
-                            >
-
-                                <div class="book-cover">
-
-                                    ${coverContent}
-
-                                </div>
-
-
-                                <div class="book-info">
-
-                                    <p class="book-category">
-                                        ${book.category || "Uncategorized"}
-                                    </p>
-
-
-                                    <h3>
-                                        ${book.title}
-                                    </h3>
-
-
-                                    <p class="book-meta">
-
-                                        ★
-                                        ${book.ratingAverage || "New"}
-
-                                    </p>
-
-                                </div>
-
-                            </a>
-
-                        `;
-
-
-                        booksGrid.appendChild(
-                            card
-                        );
-
-                    }
-                );
-
+                await loadAllBooks();
 
             } catch (error) {
 
                 console.error(
-                    "BOOK FILTER ERROR:",
+                    "BOOKS ERROR:",
                     error
                 );
 
@@ -345,7 +249,409 @@
         }
 
 
-        function getInitials(title) {
+        /*
+         * Load all published books.
+         */
+
+        async function loadAllBooks() {
+
+            pageLabel.textContent =
+                "EXPLORE BOOKEYZ";
+
+
+            pageTitle.textContent =
+                "All Books";
+
+
+            pageDescription.textContent =
+                "Explore stories across different worlds, genres, and adventures.";
+
+
+            const booksQuery =
+                query(
+                    collection(
+                        db,
+                        "books"
+                    ),
+
+                    where(
+                        "status",
+                        "==",
+                        "published"
+                    ),
+
+                    orderBy(
+                        "createdAt",
+                        "desc"
+                    )
+                );
+
+
+            const snapshot =
+                await getDocs(
+                    booksQuery
+                );
+
+
+            displayBooks(
+                snapshot.docs
+            );
+
+        }
+
+
+        /*
+         * Load books from a category.
+         */
+
+        async function loadCategoryBooks() {
+
+            pageLabel.textContent =
+                "CATEGORY";
+
+
+            pageTitle.textContent =
+                selectedCategory;
+
+
+            pageDescription.textContent =
+                `Explore ${selectedCategory} stories on Bookeyz.`;
+
+
+            const booksQuery =
+                query(
+                    collection(
+                        db,
+                        "books"
+                    ),
+
+                    where(
+                        "status",
+                        "==",
+                        "published"
+                    ),
+
+                    where(
+                        "category",
+                        "==",
+                        selectedCategory
+                    ),
+
+                    orderBy(
+                        "createdAt",
+                        "desc"
+                    )
+                );
+
+
+            const snapshot =
+                await getDocs(
+                    booksQuery
+                );
+
+
+            displayBooks(
+                snapshot.docs,
+                `No books found in ${selectedCategory} yet.`
+            );
+
+        }
+
+
+        /*
+         * Search published books.
+         *
+         * Search checks:
+         *
+         * - title
+         * - author
+         * - category
+         * - tags
+         */
+
+        async function loadSearchResults() {
+
+            const cleanSearchTerm =
+                searchTerm
+                    .trim()
+                    .toLowerCase();
+
+
+            pageLabel.textContent =
+                "SEARCH";
+
+
+            pageTitle.textContent =
+                "Search Results";
+
+
+            pageDescription.textContent =
+                `Showing results for "${searchTerm}"`;
+
+
+            if (!cleanSearchTerm) {
+
+                await loadAllBooks();
+
+                return;
+
+            }
+
+
+            /*
+             * Get all published books.
+             */
+
+            const booksQuery =
+                query(
+                    collection(
+                        db,
+                        "books"
+                    ),
+
+                    where(
+                        "status",
+                        "==",
+                        "published"
+                    ),
+
+                    orderBy(
+                        "createdAt",
+                        "desc"
+                    )
+                );
+
+
+            const snapshot =
+                await getDocs(
+                    booksQuery
+                );
+
+
+            /*
+             * Find books matching
+             * the search term.
+             */
+
+            const matchingBooks =
+                snapshot.docs.filter(
+                    (documentSnapshot) => {
+
+                        const book =
+                            documentSnapshot.data();
+
+
+                        const title =
+                            (
+                                book.title ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const author =
+                            (
+                                book.author ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const category =
+                            (
+                                book.category ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const tags =
+                            Array.isArray(
+                                book.tags
+                            )
+                                ? book.tags.join(" ").toLowerCase()
+                                : (
+                                    book.tags ||
+                                    ""
+                                ).toLowerCase();
+
+
+                        return (
+
+                            title.includes(
+                                cleanSearchTerm
+                            )
+
+                            ||
+
+                            author.includes(
+                                cleanSearchTerm
+                            )
+
+                            ||
+
+                            category.includes(
+                                cleanSearchTerm
+                            )
+
+                            ||
+
+                            tags.includes(
+                                cleanSearchTerm
+                            )
+
+                        );
+
+                    }
+                );
+
+
+            displayBooks(
+                matchingBooks,
+                `No books found for "${searchTerm}".`
+            );
+
+        }
+
+
+        /*
+         * Display book cards.
+         */
+
+        function displayBooks(
+            documents,
+            emptyMessage = "No published books yet."
+        ) {
+
+            booksGrid.innerHTML = "";
+
+
+            if (
+                documents.length === 0
+            ) {
+
+                booksGrid.innerHTML = `
+
+                    <p>
+                        ${emptyMessage}
+                    </p>
+
+                `;
+
+                return;
+
+            }
+
+
+            documents.forEach(
+                (documentSnapshot) => {
+
+                    const book =
+                        documentSnapshot.data();
+
+
+                    const bookId =
+                        documentSnapshot.id;
+
+
+                    const cover =
+                        book.coverImage;
+
+
+                    const coverContent =
+                        cover
+
+                            ? `
+
+                                <img
+                                    src="${cover}"
+                                    alt="${book.title || "Book"} cover"
+                                >
+
+                              `
+
+                            : `
+
+                                <div class="cover-placeholder">
+
+                                    ${getInitials(
+                                        book.title
+                                    )}
+
+                                </div>
+
+                              `;
+
+
+                    const card =
+                        document.createElement(
+                            "article"
+                        );
+
+
+                    card.className =
+                        "book-card";
+
+
+                    card.innerHTML = `
+
+                        <a
+                            href="book.html?id=${bookId}"
+                            class="book-card"
+                        >
+
+                            <div class="book-cover">
+
+                                ${coverContent}
+
+                            </div>
+
+
+                            <div class="book-info">
+
+                                <p class="book-category">
+
+                                    ${book.category || "Uncategorized"}
+
+                                </p>
+
+
+                                <h3>
+
+                                    ${book.title || "Untitled Book"}
+
+                                </h3>
+
+
+                                <p class="book-meta">
+
+                                    ★
+                                    ${book.ratingAverage || "New"}
+
+                                </p>
+
+                            </div>
+
+                        </a>
+
+                    `;
+
+
+                    booksGrid.appendChild(
+                        card
+                    );
+
+                }
+            );
+
+        }
+
+
+        /*
+         * Generate initials when
+         * a book has no cover.
+         */
+
+        function getInitials(
+            title
+        ) {
 
             if (!title) {
 
@@ -360,10 +666,15 @@
                     .split(/\s+/);
 
 
-            if (words.length === 1) {
+            if (
+                words.length === 1
+            ) {
 
                 return words[0]
-                    .substring(0, 2)
+                    .substring(
+                        0,
+                        2
+                    )
                     .toUpperCase();
 
             }
