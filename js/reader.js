@@ -180,6 +180,9 @@ async function loadReader() {
 
         renderReader();
 
+await recordBookReader();
+
+
     } catch (error) {
 
         console.error(
@@ -189,6 +192,72 @@ async function loadReader() {
 
         showError(
             "Unable to load this chapter."
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+   RECORD BOOK READER
+========================= */
+
+async function recordBookReader() {
+
+    if (!currentUser || !bookId) {
+        return;
+    }
+
+    try {
+
+        const readerQuery = query(
+            collection(db, "bookReaders"),
+
+            where(
+                "userId",
+                "==",
+                currentUser.uid
+            ),
+
+            where(
+                "bookId",
+                "==",
+                bookId
+            )
+        );
+
+        const snapshot =
+            await getDocs(readerQuery);
+
+
+        // User has already read this book
+        if (!snapshot.empty) {
+            return;
+        }
+
+
+        // First time this user has read this book
+        await addDoc(
+            collection(db, "bookReaders"),
+            {
+                userId:
+                    currentUser.uid,
+
+                bookId:
+                    bookId,
+
+                firstReadAt:
+                    new Date()
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "RECORD BOOK READER ERROR:",
+            error
         );
 
     }
