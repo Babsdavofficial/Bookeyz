@@ -1,26 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Bookeyz — Stories Worth Getting Lost In</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css">
+
 </head>
+
 
 <body>
 
-    <!-- Navigation -->
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
     <header class="navbar">
-        <a href="index.html" class="logo">Bookeyz</a>
+
+        <a
+            href="index.html"
+            class="logo">
+
+            Bookeyz
+
+        </a>
+
 
         <nav>
-            <a href="pages/books.html">Books</a>
-            <a href="pages/categories.html">Categories</a>
-            <a href="pages/login.html" id="loginLink">Login</a>
 
-            <div id="userArea" style="display: none;">
+            <a href="pages/books.html">
+                Books
+            </a>
+
+            <a href="pages/categories.html">
+                Categories
+            </a>
+
+            <a
+                href="pages/login.html"
+                id="loginLink">
+
+                Login
+
+            </a>
+
+
+            <div
+                id="userArea"
+                style="display: none;">
 
                 <a href="pages/library.html">
                     My Library
@@ -33,17 +70,24 @@
             </div>
 
         </nav>
+
     </header>
 
 
-    <!-- Hero Section -->
+
+    <!-- =========================
+         HERO
+    ========================== -->
+
     <main>
 
         <section class="hero">
 
             <div class="hero-content">
 
-                <p class="eyebrow">WELCOME TO BOOKEYZ</p>
+                <p class="eyebrow">
+                    WELCOME TO BOOKEYZ
+                </p>
 
                 <h1>
                     Stories worth
@@ -55,230 +99,225 @@
                     and find your next adventure.
                 </p>
 
-               <div class="search-box">
 
-    <input
-        type="text"
-        id="searchInput"
-        placeholder="Search stories..."
-        aria-label="Search stories"
-    >
+                <div class="search-box">
 
-    <button
-        type="button"
-        id="searchButton">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search stories..."
+                        aria-label="Search stories">
 
-        Search
 
-    </button>
+                    <button
+                        type="button"
+                        id="searchButton">
 
-</div>
+                        Search
+
+                    </button>
+
+                </div>
 
             </div>
 
         </section>
 
 
-        <!-- Featured Stories -->
+
+        <!-- =========================
+             FEATURED STORIES
+        ========================== -->
+
         <section class="section">
 
             <div class="section-heading">
+
                 <div>
-                    <p class="section-label">DISCOVER</p>
-                    <h2>Featured Stories</h2>
+
+                    <p class="section-label">
+                        DISCOVER
+                    </p>
+
+                    <h2>
+                        Featured Stories
+                    </h2>
+
                 </div>
 
-                <a href="pages/books.html">View all →</a>
+
+                <a href="pages/books.html">
+                    View all →
+                </a>
+
             </div>
 
 
-            <div class="book-grid">
+            <div
+                class="book-grid"
+                id="featuredBooks">
 
-                <!-- Book Card -->
-                <article class="book-card">
-
-                    <div class="book-cover">
-                        <div class="cover-placeholder">
-                            BW
-                        </div>
-                    </div>
-
-                    <div class="book-info">
-
-                        <p class="book-category">Fantasy</p>
-
-                        <h3>
-                            Beast World:
-                            The Fire Dragon Quest
-                        </h3>
-
-                        <p class="book-meta">
-                            ★ 4.8
-                        </p>
-
-                    </div>
-
-                </article>
-
-
-                <!-- Temporary second card -->
-                <article class="book-card">
-
-                    <div class="book-cover">
-                        <div class="cover-placeholder">
-                            LC
-                        </div>
-                    </div>
-
-                    <div class="book-info">
-
-                        <p class="book-category">Historical Fiction</p>
-
-                        <h3>
-                            Love Classical Chess
-                        </h3>
-
-                        <p class="book-meta">
-                            ★ New
-                        </p>
-
-                    </div>
-
-                </article>
-
-
-                <!-- Temporary third card -->
-                <article class="book-card">
-
-                    <div class="book-cover">
-                        <div class="cover-placeholder">
-                            +
-                        </div>
-                    </div>
-
-                    <div class="book-info">
-
-                        <p class="book-category">Coming Soon</p>
-
-                        <h3>
-                            Your next story
-                        </h3>
-
-                        <p class="book-meta">
-                            More stories coming
-                        </p>
-
-                    </div>
-
-                </article>
+                <p class="empty-message">
+                    Loading featured stories...
+                </p>
 
             </div>
 
         </section>
-        <section class="section" id="continueReadingSection">
-
-    <div class="section-heading">
-
-        <div>
-
-            <p class="section-label">
-                PICK UP WHERE YOU LEFT OFF
-            </p>
-
-            <h2>
-                Continue Reading
-            </h2>
-
-        </div>
-
-    </div>
 
 
-    <div id="continueReading">
 
-        <p class="empty-message">
-            Loading your reading progress...
-        </p>
+        <!-- =========================
+             CONTINUE READING
+        ========================== -->
 
-    </div>
+        <section
+            class="section"
+            id="continueReadingSection">
 
-</section>
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="section-label">
+                        PICK UP WHERE YOU LEFT OFF
+                    </p>
+
+                    <h2>
+                        Continue Reading
+                    </h2>
+
+                </div>
+
+            </div>
 
 
-        <!-- New Releases -->
+            <div id="continueReading">
+
+                <p class="empty-message">
+                    Loading your reading progress...
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             NEW RELEASES
+        ========================== -->
+
         <section class="section alternate-section">
 
             <div class="section-heading">
+
                 <div>
-                    <p class="section-label">FRESH STORIES</p>
-                    <h2>New Releases</h2>
+
+                    <p class="section-label">
+                        FRESH STORIES
+                    </p>
+
+                    <h2>
+                        New Releases
+                    </h2>
+
                 </div>
+
+
+                <a href="pages/books.html">
+                    View all →
+                </a>
+
             </div>
 
-            <p class="empty-message">
-                New stories and chapters will appear here.
-            </p>
+
+            <div
+                class="book-grid"
+                id="newReleases">
+
+                <p class="empty-message">
+                    Loading new releases...
+                </p>
+
+            </div>
 
         </section>
 
 
-        <!-- Popular Stories -->
+
+        <!-- =========================
+             POPULAR STORIES
+        ========================== -->
+
         <section class="section">
 
             <div class="section-heading">
+
                 <div>
-                    <p class="section-label">READERS ARE EXPLORING</p>
-                    <h2>Popular Stories</h2>
+
+                    <p class="section-label">
+                        READERS ARE EXPLORING
+                    </p>
+
+                    <h2>
+                        Popular Stories
+                    </h2>
+
                 </div>
+
+
+                <a href="pages/books.html">
+                    View all →
+                </a>
+
             </div>
 
-            <p class="empty-message">
-                Popular stories will appear here as Bookeyz grows.
-            </p>
+
+            <div
+                class="book-grid"
+                id="popularBooks">
+
+                <p class="empty-message">
+                    Loading popular stories...
+                </p>
+
+            </div>
 
         </section>
 
 
-        <!-- Categories -->
+
+        <!-- =========================
+             CATEGORIES
+        ========================== -->
+
         <section class="section categories-section">
 
             <div class="section-heading">
+
                 <div>
-                    <p class="section-label">EXPLORE</p>
-                    <h2>Categories</h2>
+
+                    <p class="section-label">
+                        EXPLORE
+                    </p>
+
+                    <h2>
+                        Categories
+                    </h2>
+
                 </div>
+
             </div>
 
 
-            <div class="category-grid">
+            <div
+                class="category-grid"
+                id="categoryGrid">
 
-                <a href="#" class="category-card">
-                    Fantasy
-                </a>
-
-                <a href="#" class="category-card">
-                    Romance
-                </a>
-
-                <a href="#" class="category-card">
-                    Adventure
-                </a>
-
-                <a href="#" class="category-card">
-                    Mystery
-                </a>
-
-                <a href="#" class="category-card">
-                    Action
-                </a>
-
-                <a href="#" class="category-card">
-                    Comedy
-                </a>
-
-                <a href="#" class="category-card">
-                    More
-                </a>
+                <p class="empty-message">
+                    Loading categories...
+                </p>
 
             </div>
 
@@ -287,7 +326,11 @@
     </main>
 
 
-    <!-- Footer -->
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
     <footer class="footer">
 
         <div class="footer-logo">
@@ -303,60 +346,797 @@
         </p>
 
     </footer>
-<script type="module" src="js/app.js"></script>
-
-<script>
-
-    const searchInput =
-        document.getElementById(
-            "searchInput"
-        );
 
 
-    const searchButton =
-        document.getElementById(
-            "searchButton"
-        );
+
+    <!-- =========================
+         APP JAVASCRIPT
+    ========================== -->
+
+    <script
+        type="module"
+        src="js/app.js">
+    </script>
 
 
-    function performSearch() {
 
-        const searchTerm =
-            searchInput.value.trim();
+    <!-- =========================
+         HOMEPAGE JAVASCRIPT
+    ========================== -->
+
+    <script type="module">
+
+        import {
+
+            collection,
+            getDocs,
+            query,
+            where,
+            orderBy,
+            limit
+
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-        if (!searchTerm) {
+        import {
+            db
+        } from "./js/firebase-config.js";
 
-            return;
+
+
+        // =========================
+        // ELEMENTS
+        // =========================
+
+        const featuredBooks =
+            document.getElementById(
+                "featuredBooks"
+            );
+
+
+        const newReleases =
+            document.getElementById(
+                "newReleases"
+            );
+
+
+        const popularBooks =
+            document.getElementById(
+                "popularBooks"
+            );
+
+
+        const categoryGrid =
+            document.getElementById(
+                "categoryGrid"
+            );
+
+
+
+        // =========================
+        // LOAD PUBLISHED BOOKS
+        // =========================
+
+        async function getPublishedBooks() {
+
+            const booksQuery =
+                query(
+
+                    collection(
+                        db,
+                        "books"
+                    ),
+
+                    where(
+                        "status",
+                        "==",
+                        "published"
+                    ),
+
+                    orderBy(
+                        "createdAt",
+                        "desc"
+                    )
+
+                );
+
+
+            const snapshot =
+                await getDocs(
+                    booksQuery
+                );
+
+
+            return snapshot.docs.map(
+                (documentSnapshot) => ({
+
+                    id:
+                        documentSnapshot.id,
+
+                    ...documentSnapshot.data()
+
+                })
+            );
 
         }
 
 
-        window.location.href =
-            `pages/books.html?search=${encodeURIComponent(searchTerm)}`;
 
-    }
+        // =========================
+        // LOAD FEATURED STORIES
+        // =========================
+
+        async function loadFeaturedBooks() {
+
+            try {
+
+                const books =
+                    await getPublishedBooks();
 
 
-    searchButton.addEventListener(
-        "click",
-        performSearch
-    );
+                /*
+                 * For now, featured stories use
+                 * the newest published books.
+                 *
+                 * Later the admin can choose
+                 * featured books individually.
+                 */
+
+                const featured =
+                    books.slice(
+                        0,
+                        3
+                    );
 
 
-    searchInput.addEventListener(
-        "keydown",
-        (event) => {
+                displayBooks(
+                    featuredBooks,
+                    featured,
+                    "No featured stories yet."
+                );
 
-            if (event.key === "Enter") {
 
-                performSearch();
+            } catch (error) {
+
+                console.error(
+                    "FEATURED BOOKS ERROR:",
+                    error
+                );
+
+
+                showLoadError(
+                    featuredBooks
+                );
 
             }
 
         }
-    );
 
-</script>
+
+
+        // =========================
+        // LOAD NEW RELEASES
+        // =========================
+
+        async function loadNewReleases() {
+
+            try {
+
+                const booksQuery =
+                    query(
+
+                        collection(
+                            db,
+                            "books"
+                        ),
+
+                        where(
+                            "status",
+                            "==",
+                            "published"
+                        ),
+
+                        orderBy(
+                            "createdAt",
+                            "desc"
+                        ),
+
+                        limit(6)
+
+                    );
+
+
+                const snapshot =
+                    await getDocs(
+                        booksQuery
+                    );
+
+
+                const books =
+                    snapshot.docs.map(
+                        (documentSnapshot) => ({
+
+                            id:
+                                documentSnapshot.id,
+
+                            ...documentSnapshot.data()
+
+                        })
+                    );
+
+
+                displayBooks(
+                    newReleases,
+                    books,
+                    "No new releases yet."
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "NEW RELEASES ERROR:",
+                    error
+                );
+
+
+                showLoadError(
+                    newReleases
+                );
+
+            }
+
+        }
+
+
+
+        // =========================
+        // LOAD POPULAR STORIES
+        // =========================
+
+        async function loadPopularBooks() {
+
+            try {
+
+                const booksQuery =
+                    query(
+
+                        collection(
+                            db,
+                            "books"
+                        ),
+
+                        where(
+                            "status",
+                            "==",
+                            "published"
+                        ),
+
+                        orderBy(
+                            "ratingCount",
+                            "desc"
+                        ),
+
+                        limit(6)
+
+                    );
+
+
+                const snapshot =
+                    await getDocs(
+                        booksQuery
+                    );
+
+
+                const books =
+                    snapshot.docs.map(
+                        (documentSnapshot) => ({
+
+                            id:
+                                documentSnapshot.id,
+
+                            ...documentSnapshot.data()
+
+                        })
+                    );
+
+
+                displayBooks(
+                    popularBooks,
+                    books,
+                    "No popular stories yet."
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "POPULAR BOOKS ERROR:",
+                    error
+                );
+
+
+                showLoadError(
+                    popularBooks
+                );
+
+            }
+
+        }
+
+
+
+        // =========================
+        // LOAD CATEGORIES
+        // =========================
+
+        async function loadCategories() {
+
+            try {
+
+                const categoriesQuery =
+                    query(
+                        collection(
+                            db,
+                            "categories"
+                        ),
+
+                        orderBy(
+                            "name",
+                            "asc"
+                        )
+                    );
+
+
+                const snapshot =
+                    await getDocs(
+                        categoriesQuery
+                    );
+
+
+                categoryGrid.innerHTML =
+                    "";
+
+
+                if (snapshot.empty) {
+
+                    categoryGrid.innerHTML = `
+
+                        <p class="empty-message">
+                            No categories yet.
+                        </p>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                snapshot.docs
+                    .slice(0, 8)
+                    .forEach(
+                        (documentSnapshot) => {
+
+                            const category =
+                                documentSnapshot.data();
+
+
+                            const name =
+                                category.name ||
+                                "Category";
+
+
+                            const link =
+                                document.createElement(
+                                    "a"
+                                );
+
+
+                            link.href =
+                                `pages/books.html?category=${encodeURIComponent(
+                                    name
+                                )}`;
+
+
+                            link.className =
+                                "category-card";
+
+
+                            link.textContent =
+                                name;
+
+
+                            categoryGrid.appendChild(
+                                link
+                            );
+
+                        }
+                    );
+
+
+            } catch (error) {
+
+                console.error(
+                    "CATEGORIES ERROR:",
+                    error
+                );
+
+
+                categoryGrid.innerHTML = `
+
+                    <p class="empty-message">
+                        Unable to load categories.
+                    </p>
+
+                `;
+
+            }
+
+        }
+
+
+
+        // =========================
+        // DISPLAY BOOK CARDS
+        // =========================
+
+        function displayBooks(
+            container,
+            books,
+            emptyMessage
+        ) {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                books.length === 0
+            ) {
+
+                container.innerHTML = `
+
+                    <p class="empty-message">
+                        ${emptyMessage}
+                    </p>
+
+                `;
+
+                return;
+
+            }
+
+
+            books.forEach(
+                (book) => {
+
+                    const card =
+                        document.createElement(
+                            "article"
+                        );
+
+
+                    card.className =
+                        "book-card";
+
+
+                    const rating =
+                        Number(
+                            book.ratingAverage || 0
+                        );
+
+
+                    const ratingCount =
+                        Number(
+                            book.ratingCount || 0
+                        );
+
+
+                    const ratingText =
+                        rating > 0
+
+                            ? `★ ${rating.toFixed(1)}`
+
+                            : "★ New";
+
+
+                    const ratingCountText =
+                        ratingCount === 1
+
+                            ? "1 rating"
+
+                            : `${ratingCount} ratings`;
+
+
+                    const priceText =
+                        book.free === true
+
+                            ? "Free"
+
+                            : (
+                                book.price
+                                    ? `₦${book.price}`
+                                    : "Paid"
+                            );
+
+
+                    const cover =
+                        book.coverImage;
+
+
+                    const coverContent =
+                        cover
+
+                            ? `
+
+                                <img
+                                    src="${cover}"
+                                    alt="${escapeHTML(
+                                        book.title || "Book"
+                                    )} cover"
+                                >
+
+                              `
+
+                            : `
+
+                                <div class="cover-placeholder">
+
+                                    ${getInitials(
+                                        book.title
+                                    )}
+
+                                </div>
+
+                              `;
+
+
+                    card.innerHTML = `
+
+                        <a
+                            href="pages/book.html?id=${book.id}"
+                            class="book-card">
+
+                            <div class="book-cover">
+
+                                ${coverContent}
+
+                            </div>
+
+
+                            <div class="book-info">
+
+                                <p class="book-category">
+
+                                    ${escapeHTML(
+                                        book.category ||
+                                        "Uncategorized"
+                                    )}
+
+                                </p>
+
+
+                                <h3>
+
+                                    ${escapeHTML(
+                                        book.title ||
+                                        "Untitled Book"
+                                    )}
+
+                                </h3>
+
+
+                                <p class="book-meta">
+
+                                    ${ratingText}
+
+                                    <span>
+                                        · ${ratingCountText}
+                                    </span>
+
+                                </p>
+
+
+                                <p class="book-meta">
+
+                                    ${priceText}
+
+                                </p>
+
+                            </div>
+
+                        </a>
+
+                    `;
+
+
+                    container.appendChild(
+                        card
+                    );
+
+                }
+            );
+
+        }
+
+
+
+        // =========================
+        // INITIALS
+        // =========================
+
+        function getInitials(
+            title
+        ) {
+
+            if (!title) {
+
+                return "BK";
+
+            }
+
+
+            const words =
+                title
+                    .trim()
+                    .split(/\s+/);
+
+
+            if (
+                words.length === 1
+            ) {
+
+                return words[0]
+                    .substring(
+                        0,
+                        2
+                    )
+                    .toUpperCase();
+
+            }
+
+
+            return (
+
+                words[0][0] +
+                words[1][0]
+
+            ).toUpperCase();
+
+        }
+
+
+
+        // =========================
+        // BASIC HTML SAFETY
+        // =========================
+
+        function escapeHTML(
+            value
+        ) {
+
+            return String(value)
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        }
+
+
+
+        // =========================
+        // ERROR
+        // =========================
+
+        function showLoadError(
+            container
+        ) {
+
+            container.innerHTML = `
+
+                <p class="empty-message">
+                    Unable to load stories.
+                </p>
+
+            `;
+
+        }
+
+
+
+        // =========================
+        // SEARCH
+        // =========================
+
+        const searchInput =
+            document.getElementById(
+                "searchInput"
+            );
+
+
+        const searchButton =
+            document.getElementById(
+                "searchButton"
+            );
+
+
+        function performSearch() {
+
+            const searchTerm =
+                searchInput.value.trim();
+
+
+            if (!searchTerm) {
+
+                return;
+
+            }
+
+
+            window.location.href =
+                `pages/books.html?search=${encodeURIComponent(
+                    searchTerm
+                )}`;
+
+        }
+
+
+        searchButton.addEventListener(
+            "click",
+            performSearch
+        );
+
+
+        searchInput.addEventListener(
+            "keydown",
+            (event) => {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    performSearch();
+
+                }
+
+            }
+        );
+
+
+
+        // =========================
+        // START HOMEPAGE
+        // =========================
+
+        loadFeaturedBooks();
+
+        loadNewReleases();
+
+        loadPopularBooks();
+
+        loadCategories();
+
+    </script>
+
+
 </body>
+
 </html>
