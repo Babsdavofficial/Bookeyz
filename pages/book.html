@@ -219,19 +219,26 @@
     <script type="module">
 
         import {
-        doc,
-        getDoc,
-        collection,
-        getDocs,
-        query,
-        where,
-        orderBy
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    query,
+    where,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-        import {
-            db
-        } from "../js/firebase-config.js";
+       import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+    auth,
+    db
+} from "../js/firebase-config.js";
 
 
         // =========================
@@ -298,6 +305,11 @@
             document.getElementById(
                 "chapterList"
             );
+
+        const saveBookButton =
+    document.getElementById(
+        "saveBookButton"
+    );
 
 
         // =========================
@@ -465,6 +477,146 @@
             }
 
         }
+
+
+        let currentUser = null;
+let savedBookDocumentId = null;
+
+onAuthStateChanged(auth, async (user) => {
+
+    currentUser = user;
+
+    if (!user) {
+        saveBookButton.textContent = "Login to Save";
+        return;
+    }
+
+    await checkIfBookIsSaved();
+});
+
+
+async function checkIfBookIsSaved() {
+
+    if (!currentUser || !bookId) {
+        return;
+    }
+
+    try {
+
+        const savedBooksQuery = query(
+            collection(db, "savedBooks"),
+
+            where(
+                "userId",
+                "==",
+                currentUser.uid
+            ),
+
+            where(
+                "bookId",
+                "==",
+                bookId
+            )
+        );
+
+        const snapshot =
+            await getDocs(
+                savedBooksQuery
+            );
+
+        if (!snapshot.empty) {
+
+            savedBookDocumentId =
+                snapshot.docs[0].id;
+
+            saveBookButton.textContent =
+                "Saved ✓";
+
+        } else {
+
+            savedBookDocumentId = null;
+
+            saveBookButton.textContent =
+                "Save Book";
+        }
+
+    } catch (error) {
+
+        console.error(
+            "CHECK SAVED BOOK ERROR:",
+            error
+        );
+
+    }
+}
+
+
+
+saveBookButton.addEventListener(
+    "click",
+    async () => {
+
+        if (!currentUser) {
+
+            window.location.href =
+                `login.html?redirect=${encodeURIComponent(
+                    window.location.pathname +
+                    window.location.search
+                )}`;
+
+            return;
+        }
+
+        try {
+
+            if (savedBookDocumentId) {
+
+                await deleteDoc(
+                    doc(
+                        db,
+                        "savedBooks",
+                        savedBookDocumentId
+                    )
+                );
+
+                savedBookDocumentId = null;
+
+                saveBookButton.textContent =
+                    "Save Book";
+
+                return;
+            }
+
+
+            const savedBook = await addDoc(
+                collection(db, "savedBooks"),
+                {
+                    userId: currentUser.uid,
+                    bookId: bookId,
+                    savedAt: new Date()
+                }
+            );
+
+            savedBookDocumentId =
+                savedBook.id;
+
+            saveBookButton.textContent =
+                "Saved ✓";
+
+        } catch (error) {
+
+            console.error(
+                "SAVE BOOK ERROR:",
+                error
+            );
+
+            alert(
+                "Unable to save this book right now."
+            );
+
+        }
+    }
+);
 
 
         // =========================
