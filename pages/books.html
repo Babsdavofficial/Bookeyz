@@ -32,15 +32,15 @@
 
         <section class="page-header">
 
-            <p class="section-label">
+            <p class="section-label" id="pageLabel">
                 EXPLORE BOOKEYZ
             </p>
 
-            <h1>
+            <h1 id="pageTitle">
                 All Books
             </h1>
 
-            <p>
+            <p id="pageDescription">
                 Explore stories across different worlds,
                 genres, and adventures.
             </p>
@@ -101,26 +101,113 @@
             );
 
 
+        const pageTitle =
+            document.getElementById(
+                "pageTitle"
+            );
+
+
+        const pageDescription =
+            document.getElementById(
+                "pageDescription"
+            );
+
+
+        /*
+         * Read the category from the URL.
+         *
+         * Example:
+         *
+         * books.html?category=Fantasy
+         */
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const selectedCategory =
+            urlParams.get("category");
+
+
         async function loadBooks() {
 
             try {
 
-                const booksQuery =
-                    query(
-                        collection(
-                            db,
-                            "books"
-                        ),
-                        where(
-                            "status",
-                            "==",
-                            "published"
-                        ),
-                        orderBy(
-                            "createdAt",
-                            "desc"
-                        )
-                    );
+                let booksQuery;
+
+
+                /*
+                 * If a category was selected,
+                 * only get books from that category.
+                 */
+
+                if (selectedCategory) {
+
+                    pageTitle.textContent =
+                        selectedCategory;
+
+
+                    pageDescription.textContent =
+                        `Explore ${selectedCategory} stories on Bookeyz.`;
+
+
+                    booksQuery =
+                        query(
+                            collection(
+                                db,
+                                "books"
+                            ),
+
+                            where(
+                                "status",
+                                "==",
+                                "published"
+                            ),
+
+                            where(
+                                "category",
+                                "==",
+                                selectedCategory
+                            ),
+
+                            orderBy(
+                                "createdAt",
+                                "desc"
+                            )
+                        );
+
+                }
+
+
+                /*
+                 * Otherwise show every
+                 * published book.
+                 */
+
+                else {
+
+                    booksQuery =
+                        query(
+                            collection(
+                                db,
+                                "books"
+                            ),
+
+                            where(
+                                "status",
+                                "==",
+                                "published"
+                            ),
+
+                            orderBy(
+                                "createdAt",
+                                "desc"
+                            )
+                        );
+
+                }
 
 
                 const snapshot =
@@ -135,9 +222,13 @@
                 if (snapshot.empty) {
 
                     booksGrid.innerHTML = `
+
                         <p>
-                            No published books yet.
+                            No books found in
+                            ${selectedCategory || "Bookeyz"}
+                            yet.
                         </p>
+
                     `;
 
                     return;
@@ -235,13 +326,18 @@
 
             } catch (error) {
 
-                console.error(error);
+                console.error(
+                    "BOOK FILTER ERROR:",
+                    error
+                );
 
 
                 booksGrid.innerHTML = `
+
                     <p>
                         Unable to load books.
                     </p>
+
                 `;
 
             }
@@ -252,7 +348,9 @@
         function getInitials(title) {
 
             if (!title) {
+
                 return "BK";
+
             }
 
 
