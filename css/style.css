@@ -866,3 +866,149 @@ a {
         font-size: 18px;
     }
 }
+
+/* =========================
+   MY LIBRARY
+========================= */
+
+#libraryGrid {
+    padding: 70px 7%;
+}
+
+
+#libraryMessage {
+    padding: 0 7% 20px;
+
+    font-family: Arial, sans-serif;
+    color: #6d665e;
+}
+
+
+#libraryMessage a {
+    display: inline-block;
+
+    margin-top: 12px;
+
+    padding: 12px 20px;
+
+    background: #1d1b18;
+    color: #ffffff;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+#libraryMessage a:hover {
+    background: #332e29;
+}
+
+
+/* Library book cards */
+
+#libraryGrid .book-card {
+    position: relative;
+}
+
+
+#libraryGrid .book-card a {
+    display: block;
+}
+
+
+#libraryGrid .book-cover {
+    height: 360px;
+
+    overflow: hidden;
+}
+
+
+#libraryGrid .book-cover img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition: transform 0.3s ease;
+}
+
+
+#libraryGrid .book-card:hover .book-cover img {
+    transform: scale(1.03);
+}
+
+
+.book-cover-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #29231e;
+
+    color: #ffffff;
+
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: 24px;
+}
+
+
+#libraryGrid .book-card-content {
+    padding: 22px;
+}
+
+
+#libraryGrid .book-card-content h3 {
+    font-size: 22px;
+
+    line-height: 1.2;
+
+    margin-bottom: 8px;
+}
+
+
+#libraryGrid .book-card-content p {
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    color: #756b60;
+}
+
+
+/* ---------- Library Mobile ---------- */
+
+@media (max-width: 800px) {
+
+    #libraryGrid {
+        padding: 50px 5%;
+    }
+
+
+    #libraryMessage {
+        padding: 0 5% 20px;
+    }
+
+
+    #libraryGrid .book-cover {
+        height: 420px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    #libraryGrid .book-cover {
+        height: 380px;
+    }
+
+}
