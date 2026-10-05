@@ -5,7 +5,9 @@ import {
     getDocs,
     query,
     where,
-    orderBy
+    orderBy,
+    addDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 import {
@@ -107,11 +109,16 @@ let chapters = [];
 
 let currentChapter = null;
 
+let currentUser = null;
+
+let readingProgressDocumentId = null;
+
+let lastSavedProgress = -1;
+
 
 /* =========================
    CHECK LOGIN
 ========================= */
-
 onAuthStateChanged(
     auth,
     async (user) => {
@@ -128,6 +135,8 @@ onAuthStateChanged(
             return;
 
         }
+
+        currentUser = user;
 
         await loadReader();
 
@@ -422,6 +431,188 @@ function renderReader() {
     );
 
 
+
+
+    /* =========================
+   SAVE READING PROGRESS
+========================= */
+
+async function loadReadingProgress() {
+
+    if (!currentUser || !bookId || !currentChapter) {
+        return;
+    }
+
+    try {
+
+        const progressQuery =
+            query(
+                collection(db, "readingProgress"),
+
+                where(
+                    "userId",
+                    "==",
+                    currentUser.uid
+                ),
+
+                where(
+                    "bookId",
+                    "==",
+                    bookId
+                )
+            );
+
+
+        const snapshot =
+            await getDocs(progressQuery);
+
+
+        if (!snapshot.empty) {
+
+            const progressDocument =
+                snapshot.docs[0];
+
+            readingProgressDocumentId =
+                progressDocument.id;
+
+        } else {
+
+            readingProgressDocumentId = null;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "LOAD READING PROGRESS ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+async function saveReadingProgress() {
+
+    if (
+        !currentUser ||
+        !bookId ||
+        !currentChapter
+    ) {
+        return;
+    }
+
+
+    const scrollTop =
+        window.scrollY;
+
+
+    const documentHeight =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+
+
+    let progress = 0;
+
+
+    if (documentHeight > 0) {
+
+        progress =
+            Math.round(
+                (
+                    scrollTop /
+                    documentHeight
+                ) * 100
+            );
+
+    }
+
+
+    /*
+       Don't constantly write the
+       same percentage to Firestore.
+    */
+
+    if (
+        progress === lastSavedProgress
+    ) {
+        return;
+    }
+
+
+    lastSavedProgress = progress;
+
+
+    try {
+
+        const progressData = {
+
+            userId:
+                currentUser.uid,
+
+            bookId:
+                bookId,
+
+            chapterId:
+                currentChapter.id,
+
+            chapterNumber:
+                Number(currentChapter.number),
+
+            language:
+                currentChapter.language || "en",
+
+            progress:
+                progress,
+
+            updatedAt:
+                new Date()
+
+        };
+
+
+        if (
+            readingProgressDocumentId
+        ) {
+
+            await updateDoc(
+                doc(
+                    db,
+                    "readingProgress",
+                    readingProgressDocumentId
+                ),
+                progressData
+            );
+
+        } else {
+
+            const progressDocument =
+                await addDoc(
+                    collection(
+                        db,
+                        "readingProgress"
+                    ),
+                    progressData
+                );
+
+
+            readingProgressDocumentId =
+                progressDocument.id;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "SAVE READING PROGRESS ERROR:",
+            error
+        );
+
+    }
+
+}
+
     /* =========================
        ARTWORK
     ========================= */
@@ -446,6 +637,8 @@ function renderReader() {
     );
 
     updateReadingProgress();
+
+loadReadingProgress();
 
 }
 
@@ -650,7 +843,13 @@ function updateReadingProgress() {
 
 window.addEventListener(
     "scroll",
-    updateReadingProgress
+    () => {
+
+        updateReadingProgress();
+
+        saveReadingProgress();
+
+    }
 );
 
 
