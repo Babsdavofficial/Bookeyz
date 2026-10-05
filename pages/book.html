@@ -219,9 +219,14 @@
     <script type="module">
 
         import {
-            doc,
-            getDoc
-        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+        doc,
+        getDoc,
+        collection,
+        getDocs,
+        query,
+        where,
+        orderBy
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
         import {
@@ -473,29 +478,134 @@
         // =========================
 
         async function loadChapters(
-            bookId
-        ) {
+    bookId
+) {
 
-            /*
-             * Chapters will be connected
-             * properly in Stage 9.
-             *
-             * For now we keep the
-             * existing chapter area
-             * as a placeholder.
-             */
+    try {
+
+        const chaptersQuery =
+            query(
+                collection(
+                    db,
+                    "chapters"
+                ),
+
+                where(
+                    "bookId",
+                    "==",
+                    bookId
+                ),
+
+                where(
+                    "status",
+                    "==",
+                    "published"
+                ),
+
+                orderBy(
+                    "number",
+                    "asc"
+                )
+            );
+
+
+        const chaptersSnapshot =
+            await getDocs(
+                chaptersQuery
+            );
+
+
+        chapterList.innerHTML = "";
+
+
+        if (
+            chaptersSnapshot.empty
+        ) {
 
             chapterList.innerHTML = `
 
                 <p>
-                    Chapters will appear here
-                    when the reader is connected
-                    to Firestore.
+                    No published chapters yet.
                 </p>
 
             `;
 
+            return;
+
         }
+
+
+        chaptersSnapshot.forEach(
+            (chapterSnapshot) => {
+
+                const chapter =
+                    chapterSnapshot.data();
+
+
+                const chapterLink =
+                    document.createElement(
+                        "a"
+                    );
+
+
+                chapterLink.href =
+                    `reader.html?book=${bookId}&chapter=${chapter.number}`;
+
+
+                chapterLink.className =
+                    "chapter-item";
+
+
+                chapterLink.innerHTML = `
+
+                    <div>
+
+                        <span
+                            class="chapter-number">
+                            Chapter ${chapter.number}
+                        </span>
+
+                        <strong>
+                            ${chapter.title || `Chapter ${chapter.number}`}
+                        </strong>
+
+                    </div>
+
+                    <span
+                        class="chapter-arrow">
+                        →
+                    </span>
+
+                `;
+
+
+                chapterList.appendChild(
+                    chapterLink
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "CHAPTERS ERROR:",
+            error
+        );
+
+
+        chapterList.innerHTML = `
+
+            <p>
+                Unable to load chapters.
+            </p>
+
+        `;
+
+    }
+
+}
 
 
         // =========================
