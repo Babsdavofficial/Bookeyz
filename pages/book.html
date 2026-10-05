@@ -413,14 +413,8 @@
                 const rating =
                     book.ratingAverage;
 
-
-                const chapterCount =
-                    book.chapterCount || 0;
-
-
                 const isFree =
                     book.free === true;
-
 
                 bookStats.innerHTML = `
 
@@ -428,8 +422,8 @@
                         ★ ${rating || "New"}
                     </span>
 
-                    <span>
-                        ${chapterCount} Chapters
+                    <span id="chapterCountStat">
+                        Loading chapters...
                     </span>
 
                     <span>
@@ -516,24 +510,33 @@
 
 
         chapterList.innerHTML = "";
+        const chapterCountStat =
+    document.getElementById("chapterCountStat");
 
 
-        if (
-            chaptersSnapshot.empty
-        ) {
+       if (chaptersSnapshot.empty) {
 
-            chapterList.innerHTML = `
+    if (chapterCountStat) {
+        chapterCountStat.textContent = "0 Chapters";
+    }
 
-                <p>
-                    No published chapters yet.
-                </p>
+    chapterList.innerHTML = `
+        <p>
+            No published chapters yet.
+        </p>
+    `;
 
-            `;
+    return;
+}
 
-            return;
-
-        }
-
+if (chapterCountStat) {
+    chapterCountStat.textContent =
+        `${chaptersSnapshot.size} ${
+            chaptersSnapshot.size === 1
+                ? "Chapter"
+                : "Chapters"
+        }`;
+}
 
         chaptersSnapshot.forEach(
             (chapterSnapshot) => {
