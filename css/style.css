@@ -1164,3 +1164,72 @@ a {
     }
 
 }
+
+/* =========================
+   BOOK RATINGS
+========================= */
+
+.book-rating-box {
+    width: 100%;
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #e4ded4;
+}
+
+.rating-label {
+    margin-bottom: 8px;
+
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #756b60;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 4px;
+}
+
+.rating-stars button {
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    font-size: 27px;
+    line-height: 1;
+
+    color: #cfc7bc;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.rating-stars button:hover,
+.rating-stars button.active {
+    color: #1d1b18;
+    transform: translateY(-2px);
+}
+
+.rating-message {
+    min-height: 20px;
+
+    margin-top: 8px;
+
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+
+    color: #756b60;
+}
+
+@media (max-width: 600px) {
+
+    .rating-stars button {
+        font-size: 24px;
+    }
+
+}

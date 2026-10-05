@@ -150,6 +150,32 @@
         Save Book
 
     </button>
+
+
+    <div class="book-rating-box">
+
+    <p class="rating-label">
+        Rate this book
+    </p>
+
+    <div
+        id="ratingStars"
+        class="rating-stars">
+
+        <button type="button" data-rating="1">★</button>
+        <button type="button" data-rating="2">★</button>
+        <button type="button" data-rating="3">★</button>
+        <button type="button" data-rating="4">★</button>
+        <button type="button" data-rating="5">★</button>
+
+    </div>
+
+    <p
+        id="ratingMessage"
+        class="rating-message">
+    </p>
+
+</div>
                 </div>
 
             </div>
@@ -311,6 +337,26 @@ import {
         "saveBookButton"
     );
 
+    const bookRating =
+    document.getElementById(
+        "bookRating"
+    );
+
+const ratingCount =
+    document.getElementById(
+        "ratingCount"
+    );
+
+const ratingStars =
+    document.getElementById(
+        "ratingStars"
+    );
+
+const ratingMessage =
+    document.getElementById(
+        "ratingMessage"
+    );
+
 
         // =========================
         // LOAD BOOK
@@ -422,27 +468,33 @@ import {
                 // BOOK STATS
                 // =========================
 
-                const rating =
-                    book.ratingAverage;
+               const rating =
+    Number(book.ratingAverage || 0);
 
-                const isFree =
-                    book.free === true;
+const totalRatings =
+    Number(book.ratingCount || 0);
 
-                bookStats.innerHTML = `
+const isFree =
+    book.free === true;
 
-                    <span>
-                        ★ ${rating || "New"}
-                    </span>
+bookRating.textContent =
+    rating > 0
+        ? `★ ${rating.toFixed(1)}`
+        : "★ New";
 
-                    <span id="chapterCountStat">
-                        Loading chapters...
-                    </span>
+ratingCount.textContent =
+    `${totalRatings} ${
+        totalRatings === 1
+            ? "rating"
+            : "ratings"
+    }`;
 
-                    <span>
-                        ${isFree ? "Free" : "Paid"}
-                    </span>
-
-                `;
+document.getElementById(
+    "bookPrice"
+).textContent =
+    isFree
+        ? "Free"
+        : "Paid";
 
 
                 // =========================
@@ -487,11 +539,17 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
 
     if (!user) {
-        saveBookButton.textContent = "Login to Save";
+
+        saveBookButton.textContent =
+            "Login to Save";
+
         return;
     }
 
     await checkIfBookIsSaved();
+
+    await loadUserRating();
+
 });
 
 
@@ -617,6 +675,369 @@ saveBookButton.addEventListener(
         }
     }
 );
+
+
+
+
+
+// =========================
+// RATINGS
+// =========================
+
+let userRatingDocumentId = null;
+let userRating = 0;
+
+
+// -------------------------
+// LOAD USER'S RATING
+// -------------------------
+
+async function loadUserRating() {
+
+    if (!currentUser || !bookId) {
+        return;
+    }
+
+    try {
+
+        const ratingQuery =
+            query(
+                collection(
+                    db,
+                    "ratings"
+                ),
+
+                where(
+                    "userId",
+                    "==",
+                    currentUser.uid
+                ),
+
+                where(
+                    "bookId",
+                    "==",
+                    bookId
+                )
+            );
+
+        const snapshot =
+            await getDocs(
+                ratingQuery
+            );
+
+        if (!snapshot.empty) {
+
+            const ratingDocument =
+                snapshot.docs[0];
+
+            userRatingDocumentId =
+                ratingDocument.id;
+
+            userRating =
+                Number(
+                    ratingDocument.data().rating
+                );
+
+            highlightRating(
+                userRating
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "LOAD USER RATING ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+// -------------------------
+// STAR CLICK
+// -------------------------
+
+if (ratingStars) {
+
+    ratingStars
+        .querySelectorAll("button")
+        .forEach((button) => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const selectedRating =
+                        Number(
+                            button.dataset.rating
+                        );
+
+                    await submitRating(
+                        selectedRating
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+// -------------------------
+// SUBMIT RATING
+// -------------------------
+
+async function submitRating(
+    selectedRating
+) {
+
+    if (!currentUser) {
+
+        window.location.href =
+            `login.html?redirect=${encodeURIComponent(
+                window.location.pathname +
+                window.location.search
+            )}`;
+
+        return;
+
+    }
+
+    if (
+        selectedRating < 1 ||
+        selectedRating > 5
+    ) {
+        return;
+    }
+
+    try {
+
+        ratingMessage.textContent =
+            "Saving rating...";
+
+
+        const ratingData = {
+
+            userId:
+                currentUser.uid,
+
+            bookId:
+                bookId,
+
+            rating:
+                selectedRating,
+
+            updatedAt:
+                new Date()
+
+        };
+
+
+        if (
+            userRatingDocumentId
+        ) {
+
+            await updateDoc(
+
+                doc(
+                    db,
+                    "ratings",
+                    userRatingDocumentId
+                ),
+
+                ratingData
+
+            );
+
+        } else {
+
+            const newRating =
+                await addDoc(
+
+                    collection(
+                        db,
+                        "ratings"
+                    ),
+
+                    {
+                        ...ratingData,
+                        createdAt:
+                            new Date()
+                    }
+
+                );
+
+            userRatingDocumentId =
+                newRating.id;
+
+        }
+
+
+        userRating =
+            selectedRating;
+
+
+        highlightRating(
+            selectedRating
+        );
+
+
+        ratingMessage.textContent =
+            "Your rating has been saved.";
+
+        await recalculateBookRating();
+
+    } catch (error) {
+
+        console.error(
+            "SUBMIT RATING ERROR:",
+            error
+        );
+
+        ratingMessage.textContent =
+            "Unable to save your rating.";
+
+    }
+
+}
+
+
+// -------------------------
+// HIGHLIGHT STARS
+// -------------------------
+
+function highlightRating(
+    rating
+) {
+
+    if (!ratingStars) {
+        return;
+    }
+
+    const buttons =
+        ratingStars.querySelectorAll(
+            "button"
+        );
+
+    buttons.forEach(
+        (button) => {
+
+            const value =
+                Number(
+                    button.dataset.rating
+                );
+
+            button.classList.toggle(
+                "active",
+                value <= rating
+            );
+
+        }
+    );
+
+}
+
+
+// -------------------------
+// RECALCULATE BOOK RATING
+// -------------------------
+
+async function recalculateBookRating() {
+
+    try {
+
+        const ratingsQuery =
+            query(
+                collection(
+                    db,
+                    "ratings"
+                ),
+
+                where(
+                    "bookId",
+                    "==",
+                    bookId
+                )
+            );
+
+        const snapshot =
+            await getDocs(
+                ratingsQuery
+            );
+
+        const ratingCountValue =
+            snapshot.size;
+
+        let total =
+            0;
+
+        snapshot.forEach(
+            (ratingDocument) => {
+
+                total +=
+                    Number(
+                        ratingDocument.data().rating
+                    );
+
+            }
+        );
+
+        const average =
+            ratingCountValue > 0
+                ? total / ratingCountValue
+                : 0;
+
+
+        await updateDoc(
+
+            doc(
+                db,
+                "books",
+                bookId
+            ),
+
+            {
+                ratingAverage:
+                    Number(
+                        average.toFixed(1)
+                    ),
+
+                ratingCount:
+                    ratingCountValue,
+
+                updatedAt:
+                    new Date()
+            }
+
+        );
+
+
+        bookRating.textContent =
+            average > 0
+                ? `★ ${average.toFixed(1)}`
+                : "★ New";
+
+        ratingCount.textContent =
+            `${ratingCountValue} ${
+                ratingCountValue === 1
+                    ? "rating"
+                    : "ratings"
+            }`;
+
+    } catch (error) {
+
+        console.error(
+            "RECALCULATE RATING ERROR:",
+            error
+        );
+
+    }
+
+}
 
 
         // =========================
