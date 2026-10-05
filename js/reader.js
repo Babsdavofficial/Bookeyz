@@ -1,328 +1,39 @@
-/* =========================
-   BOOKEY Z READER
-   DYNAMIC CHAPTER SYSTEM
-========================= */
+import {
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    query,
+    where,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+    auth,
+    db
+} from "./firebase-config.js";
 
 
 /* =========================
-   BOOK DATA
+   GET URL PARAMETERS
 ========================= */
 
-const book = {
-
-    id: "beast-world",
-
-    title: "Beast World: The Fire Dragon Quest",
-
-    author: "Bookeyz",
-
-    category: "Fantasy"
-
-};
-
-
-/* =========================
-   CHAPTER DATA
-========================= */
-
-const chapters = [
-
-    {
-        number: 1,
-
-        title: "The Festival Before the Storm",
-
-        content: [
-            "The kingdom of Ember was alive with celebration.",
-
-            "Bright banners stretched between the ancient stone towers, while musicians filled the streets with songs and drums. Merchants shouted from their stalls, children ran through the crowded streets, and warriors gathered around the great festival grounds.",
-
-            "It was the annual Festival of Flames, a celebration held to honor the strength and history of the kingdom.",
-
-            "From the highest tower of the royal palace, Princess Sofia watched the celebration below.",
-
-            "Everything appeared peaceful.",
-
-            "But something about the sky troubled her.",
-
-            "Dark clouds were slowly gathering beyond the mountains.",
-
-            "Sofia turned toward the horizon.",
-
-            "Somewhere beyond those mountains, something was coming.",
-
-            "And before the night was over, the kingdom of Ember would never be the same again."
-        ]
-
-    },
-
-
-    {
-        number: 2,
-
-        title: "The First Flames",
-
-        content: [
-            "The celebration continued long into the evening.",
-
-            "The people of Ember gathered around enormous fires as the musicians played their final songs.",
-
-            "Princess Sofia remained near the palace balcony, watching the distant mountains.",
-
-            "The clouds had grown darker.",
-
-            "Then she saw it.",
-
-            "A faint orange glow appeared beyond the mountains.",
-
-            "At first, she thought it was lightning.",
-
-            "But the glow grew brighter.",
-
-            "The ground suddenly trembled beneath the palace.",
-
-            "The festival came to a complete silence.",
-
-            "Far beyond the kingdom, something enormous had awakened."
-        ]
-
-    },
-
-
-    {
-        number: 3,
-
-        title: "The Fire Dragon's Warning",
-
-        content: [
-            "The strange glow spread across the night sky.",
-
-            "Warriors rushed toward the outer walls of Ember while the citizens were ordered to remain inside the city.",
-
-            "King Valoron stood at the highest watchtower.",
-
-            "He stared toward the mountains in silence.",
-
-            "Then a roar echoed across the kingdom.",
-
-            "The sound was so powerful that windows shook throughout the city.",
-
-            "A massive shadow moved across the clouds.",
-
-            "The ancient legends were no longer legends.",
-
-            "The Fire Dragon had returned.",
-
-            "But the dragon did not attack.",
-
-            "Instead, it delivered a warning."
-        ]
-
-    },
-
-
-    {
-        number: 4,
-
-        title: "Shadow Over Ember Kingdom",
-
-        content: [
-            "The morning after the festival was unlike anything Ember had ever seen.",
-
-            "The streets were almost empty.",
-
-            "Soldiers stood at every major entrance while the royal council gathered inside the palace.",
-
-            "King Valoron listened carefully as the Five Wise Men discussed the dragon's warning.",
-
-            "Armun believed the kingdom was facing an ancient enemy.",
-
-            "Miria warned that the other kingdoms might soon become involved.",
-
-            "Dren argued that Ember needed to prepare its army.",
-
-            "The danger was no longer somewhere beyond the mountains.",
-
-            "It was moving closer."
-        ]
-
-    },
-
-
-    {
-        number: 5,
-
-        title: "The March Into Ashes",
-
-        content: [
-            "The army of Ember began its journey before sunrise.",
-
-            "Thousands of warriors marched through the mountain pass while the kingdom prepared for what might come next.",
-
-            "David and Shawn followed the main army, determined to discover what had happened beyond the mountains.",
-
-            "Smoke filled the distant sky.",
-
-            "The farther they traveled, the darker the land became.",
-
-            "Trees stood burned and silent along the road.",
-
-            "Then the soldiers reached the edge of the Ashlands.",
-
-            "Something had happened there.",
-
-            "Something powerful."
-        ]
-
-    },
-
-
-    {
-        number: 6,
-
-        title: "The Secret Beneath the Mountain",
-
-        content: [
-            "The warriors discovered an ancient passage hidden beneath the mountain.",
-
-            "The entrance was covered with symbols that none of the soldiers recognized.",
-
-            "David stepped closer and noticed a strange mark carved into the stone.",
-
-            "The same symbol had appeared in the dragon's warning.",
-
-            "Shawn looked deeper into the darkness.",
-
-            "A faint light could be seen at the end of the passage.",
-
-            "Whatever was waiting below had been hidden for centuries.",
-
-            "And now it had been discovered."
-        ]
-
-    },
-
-
-    {
-        number: 7,
-
-        title: "The Return and the Flame Within",
-
-        content: [
-            "The journey back to Ember was filled with uncertainty.",
-
-            "The warriors carried knowledge that could change the future of every kingdom.",
-
-            "Princess Sofia stood at the gates when the army finally returned.",
-
-            "She could see the exhaustion on their faces.",
-
-            "But she could also see something else.",
-
-            "Hope.",
-
-            "The dragon's warning had revealed a danger, but it had also revealed a path forward.",
-
-            "The battle ahead would not be won by strength alone.",
-
-            "It would require courage, trust, and the flame within every warrior."
-        ]
-
-    },
-
-
-    {
-        number: 8,
-
-        title: "Shadows of the Past",
-
-        content: [
-            "That night, the royal council gathered once again.",
-
-            "Ancient records were brought from the deepest chambers of the palace.",
-
-            "The Five Wise Men searched through forgotten histories.",
-
-            "They discovered that the Fire Dragon had appeared before.",
-
-            "Hundreds of years ago, the same warning had been delivered.",
-
-            "But the people of Ember had forgotten the meaning of the message.",
-
-            "Now the past had returned.",
-
-            "And the answers to the kingdom's future were hidden inside the oldest stories."
-        ]
-
-    },
-
-
-    {
-        number: 9,
-
-        title: "The Lock and the Worthy Blade",
-
-        content: [
-            "Deep beneath the royal palace stood an ancient chamber.",
-
-            "At its center was a massive stone door.",
-
-            "A single sword rested before it.",
-
-            "The weapon had been sealed there for generations.",
-
-            "According to the ancient records, only someone worthy could awaken its power.",
-
-            "Princess Sofia approached the sword.",
-
-            "The chamber became completely silent.",
-
-            "Then the sword began to glow.",
-
-            "The ancient lock opened.",
-
-            "And somewhere beyond the kingdom, something answered."
-        ]
-
-    }
-
-];
-
-
-/* =========================
-   GET CHAPTER FROM URL
-========================= */
-
-const urlParams = new URLSearchParams(window.location.search);
-
-let chapterNumber =
-    parseInt(urlParams.get("chapter")) || 1;
-
-
-/* =========================
-   FIND CHAPTER
-========================= */
-
-let currentChapter =
-    chapters.find(
-        chapter => chapter.number === chapterNumber
+const urlParams =
+    new URLSearchParams(
+        window.location.search
     );
 
+const bookId =
+    urlParams.get("book");
 
-/* =========================
-   FALLBACK
-========================= */
-
-if (!currentChapter) {
-
-    chapterNumber = 1;
-
-    currentChapter =
-        chapters.find(
-            chapter => chapter.number === 1
-        );
-
-}
+let chapterNumber =
+    parseInt(
+        urlParams.get("chapter")
+    ) || 1;
 
 
 /* =========================
@@ -330,130 +41,536 @@ if (!currentChapter) {
 ========================= */
 
 const readerBookTitle =
-    document.getElementById("readerBookTitle");
+    document.getElementById(
+        "readerBookTitle"
+    );
 
 const readerAuthor =
-    document.getElementById("readerAuthor");
+    document.getElementById(
+        "readerAuthor"
+    );
 
 const readerCategory =
-    document.getElementById("readerCategory");
+    document.getElementById(
+        "readerCategory"
+    );
 
 const chapterNumberElement =
-    document.getElementById("chapterNumber");
+    document.getElementById(
+        "chapterNumber"
+    );
 
 const chapterTitleElement =
-    document.getElementById("chapterTitle");
+    document.getElementById(
+        "chapterTitle"
+    );
 
 const currentChapterNumber =
-    document.getElementById("currentChapterNumber");
+    document.getElementById(
+        "currentChapterNumber"
+    );
 
 const storyContent =
-    document.getElementById("storyContent");
+    document.getElementById(
+        "storyContent"
+    );
 
 const previousChapter =
-    document.getElementById("previousChapter");
+    document.getElementById(
+        "previousChapter"
+    );
 
 const nextChapter =
-    document.getElementById("nextChapter");
+    document.getElementById(
+        "nextChapter"
+    );
 
 const readingProgress =
-    document.getElementById("readingProgress");
+    document.getElementById(
+        "readingProgress"
+    );
+
+const artworkPlaceholder =
+    document.querySelector(
+        ".artwork-placeholder"
+    );
 
 
 /* =========================
-   LOAD BOOK INFORMATION
+   STORAGE
 ========================= */
 
-readerBookTitle.textContent =
-    book.title;
+let book = null;
 
-readerAuthor.textContent =
-    "By " + book.author;
+let chapters = [];
 
-readerCategory.textContent =
-    book.category;
+let currentChapter = null;
 
 
 /* =========================
-   LOAD CHAPTER INFORMATION
+   CHECK LOGIN
 ========================= */
 
-chapterNumberElement.textContent =
-    "CHAPTER " + currentChapter.number;
+onAuthStateChanged(
+    auth,
+    async (user) => {
 
-chapterTitleElement.textContent =
-    currentChapter.title;
+        if (!user) {
 
-currentChapterNumber.textContent =
-    currentChapter.number;
+            const currentUrl =
+                window.location.pathname +
+                window.location.search;
 
+            window.location.href =
+                `login.html?redirect=${encodeURIComponent(currentUrl)}`;
 
-/* =========================
-   LOAD STORY
-========================= */
+            return;
 
-storyContent.innerHTML = "";
+        }
 
-
-currentChapter.content.forEach(
-    paragraph => {
-
-        const p =
-            document.createElement("p");
-
-        p.textContent =
-            paragraph;
-
-        storyContent.appendChild(p);
+        await loadReader();
 
     }
 );
 
 
 /* =========================
-   PREVIOUS CHAPTER
+   LOAD READER
 ========================= */
 
-if (currentChapter.number > 1) {
+async function loadReader() {
 
-    previousChapter.href =
-        `reader.html?book=${book.id}&chapter=${currentChapter.number - 1}`;
+    if (!bookId) {
 
-} else {
+        showError(
+            "No book was selected."
+        );
 
-    previousChapter.classList.add("disabled");
+        return;
 
-    previousChapter.removeAttribute("href");
+    }
+
+    try {
+
+        await loadBook();
+
+        await loadChapters();
+
+        findCurrentChapter();
+
+        if (!currentChapter) {
+
+            showError(
+                "This chapter could not be found."
+            );
+
+            return;
+
+        }
+
+        renderReader();
+
+    } catch (error) {
+
+        console.error(
+            "READER ERROR:",
+            error
+        );
+
+        showError(
+            "Unable to load this chapter."
+        );
+
+    }
 
 }
 
 
 /* =========================
-   NEXT CHAPTER
+   LOAD BOOK
 ========================= */
 
-if (
-    currentChapter.number <
-    chapters.length
-) {
+async function loadBook() {
 
-    nextChapter.href =
-        `reader.html?book=${book.id}&chapter=${currentChapter.number + 1}`;
+    const bookReference =
+        doc(
+            db,
+            "books",
+            bookId
+        );
 
-} else {
+    const bookSnapshot =
+        await getDoc(
+            bookReference
+        );
 
-    nextChapter.classList.add("disabled");
+    if (!bookSnapshot.exists()) {
 
-    nextChapter.removeAttribute("href");
+        throw new Error(
+            "Book not found."
+        );
+
+    }
+
+    book =
+        bookSnapshot.data();
+
+
+    /* =========================
+       BOOK INFORMATION
+    ========================= */
+
+    document.title =
+        `Reading ${book.title || "Book"} — Bookeyz`;
+
+    readerBookTitle.textContent =
+        book.title ||
+        "Untitled Book";
+
+    readerAuthor.textContent =
+        `By ${book.author || "Unknown Author"}`;
+
+    readerCategory.textContent =
+        book.category ||
+        "Uncategorized";
+
+
+    /* =========================
+       READER BACKGROUND
+    ========================= */
+
+    if (book.backgroundImage) {
+
+        document.body.style.backgroundImage =
+            `
+            linear-gradient(
+                rgba(15, 20, 30, 0.78),
+                rgba(15, 20, 30, 0.88)
+            ),
+            url("${book.backgroundImage}")
+            `;
+
+    }
 
 }
 
 
 /* =========================
-   RESET SCROLL POSITION
+   LOAD CHAPTERS
 ========================= */
 
-window.scrollTo(0, 0);
+async function loadChapters() {
+
+    const chaptersQuery =
+        query(
+            collection(
+                db,
+                "chapters"
+            ),
+
+            where(
+                "bookId",
+                "==",
+                bookId
+            ),
+
+            where(
+                "status",
+                "==",
+                "published"
+            ),
+
+            orderBy(
+                "number",
+                "asc"
+            )
+        );
+
+
+    const chaptersSnapshot =
+        await getDocs(
+            chaptersQuery
+        );
+
+
+    chapters = [];
+
+
+    chaptersSnapshot.forEach(
+        (chapterSnapshot) => {
+
+            chapters.push({
+                id:
+                    chapterSnapshot.id,
+
+                ...chapterSnapshot.data()
+
+            });
+
+        }
+    );
+
+}
+
+
+/* =========================
+   FIND CURRENT CHAPTER
+========================= */
+
+function findCurrentChapter() {
+
+    currentChapter =
+        chapters.find(
+            (chapter) =>
+                Number(
+                    chapter.number
+                ) === chapterNumber
+        );
+
+}
+
+
+/* =========================
+   RENDER READER
+========================= */
+
+function renderReader() {
+
+    /* =========================
+       CHAPTER INFORMATION
+    ========================= */
+
+    chapterNumberElement.textContent =
+        `CHAPTER ${currentChapter.number}`;
+
+    chapterTitleElement.textContent =
+        currentChapter.title ||
+        `Chapter ${currentChapter.number}`;
+
+    currentChapterNumber.textContent =
+        currentChapter.number;
+
+
+    /* =========================
+       STORY CONTENT
+    ========================= */
+
+    storyContent.innerHTML = "";
+
+    const content =
+        currentChapter.content ||
+        "";
+
+
+    const paragraphs =
+        content
+            .split(/\r?\n/)
+            .map(
+                paragraph =>
+                    paragraph.trim()
+            )
+            .filter(
+                paragraph =>
+                    paragraph.length > 0
+            );
+
+
+    paragraphs.forEach(
+        (paragraph) => {
+
+            const p =
+                document.createElement(
+                    "p"
+                );
+
+            p.textContent =
+                paragraph;
+
+            storyContent.appendChild(
+                p
+            );
+
+        }
+    );
+
+
+    /* =========================
+       ARTWORK
+    ========================= */
+
+    renderArtwork();
+
+
+    /* =========================
+       CHAPTER NAVIGATION
+    ========================= */
+
+    setupNavigation();
+
+
+    /* =========================
+       RESET SCROLL
+    ========================= */
+
+    window.scrollTo(
+        0,
+        0
+    );
+
+    updateReadingProgress();
+
+}
+
+
+/* =========================
+   RENDER ARTWORK
+========================= */
+
+function renderArtwork() {
+
+    if (!artworkPlaceholder) {
+        return;
+    }
+
+
+    artworkPlaceholder.innerHTML = "";
+
+
+    if (
+        currentChapter.artwork
+    ) {
+
+        const image =
+            document.createElement(
+                "img"
+            );
+
+        image.src =
+            currentChapter.artwork;
+
+        image.alt =
+            currentChapter.title ||
+            "Chapter artwork";
+
+        image.style.width =
+            "100%";
+
+        image.style.height =
+            "100%";
+
+        image.style.minHeight =
+            "280px";
+
+        image.style.objectFit =
+            "cover";
+
+        image.style.borderRadius =
+            "12px";
+
+        artworkPlaceholder.appendChild(
+            image
+        );
+
+    } else {
+
+        const text =
+            document.createElement(
+                "span"
+            );
+
+        text.textContent =
+            "Chapter Artwork";
+
+        artworkPlaceholder.appendChild(
+            text
+        );
+
+    }
+
+}
+
+
+/* =========================
+   CHAPTER NAVIGATION
+========================= */
+
+function setupNavigation() {
+
+    const currentIndex =
+        chapters.findIndex(
+            (chapter) =>
+                chapter.id ===
+                currentChapter.id
+        );
+
+
+    /* =========================
+       PREVIOUS
+    ========================= */
+
+    if (
+        currentIndex > 0
+    ) {
+
+        const previous =
+            chapters[
+                currentIndex - 1
+            ];
+
+        previousChapter.href =
+            `reader.html?book=${bookId}&chapter=${previous.number}`;
+
+        previousChapter.classList.remove(
+            "disabled"
+        );
+
+    } else {
+
+        previousChapter.removeAttribute(
+            "href"
+        );
+
+        previousChapter.classList.add(
+            "disabled"
+        );
+
+    }
+
+
+    /* =========================
+       NEXT
+    ========================= */
+
+    if (
+        currentIndex <
+        chapters.length - 1
+    ) {
+
+        const next =
+            chapters[
+                currentIndex + 1
+            ];
+
+        nextChapter.href =
+            `reader.html?book=${bookId}&chapter=${next.number}`;
+
+        nextChapter.classList.remove(
+            "disabled"
+        );
+
+    } else {
+
+        nextChapter.removeAttribute(
+            "href"
+        );
+
+        nextChapter.classList.add(
+            "disabled"
+        );
+
+    }
+
+}
 
 
 /* =========================
@@ -462,26 +579,43 @@ window.scrollTo(0, 0);
 
 function updateReadingProgress() {
 
+    if (!readingProgress) {
+        return;
+    }
+
+
     const scrollTop =
         window.scrollY;
 
+
     const documentHeight =
-        document.documentElement.scrollHeight -
-        document.documentElement.clientHeight;
+        document.documentElement
+            .scrollHeight -
+        document.documentElement
+            .clientHeight;
 
-    if (documentHeight <= 0) {
 
-        readingProgress.style.width = "100%";
+    if (
+        documentHeight <= 0
+    ) {
+
+        readingProgress.style.width =
+            "100%";
 
         return;
 
     }
 
+
     const progress =
-        (scrollTop / documentHeight) * 100;
+        (
+            scrollTop /
+            documentHeight
+        ) * 100;
+
 
     readingProgress.style.width =
-        progress + "%";
+        `${progress}%`;
 
 }
 
@@ -492,66 +626,105 @@ window.addEventListener(
 );
 
 
-updateReadingProgress();
+/* =========================
+   ERROR
+========================= */
 
+function showError(
+    message
+) {
+
+    chapterNumberElement.textContent =
+        "";
+
+    chapterTitleElement.textContent =
+        "Unable to load chapter";
+
+    storyContent.innerHTML = "";
+
+
+    const paragraph =
+        document.createElement(
+            "p"
+        );
+
+    paragraph.textContent =
+        message;
+
+    storyContent.appendChild(
+        paragraph
+    );
+
+
+    previousChapter.classList.add(
+        "disabled"
+    );
+
+    nextChapter.classList.add(
+        "disabled"
+    );
+
+}
 
 
 /* =========================
-   BASIC COPY PROTECTION
+   COPY PROTECTION
 ========================= */
 
-// Disable right-click
-document.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-});
+document.addEventListener(
+    "contextmenu",
+    (event) => {
 
-
-// Disable common keyboard shortcuts
-document.addEventListener("keydown", (event) => {
-
-    // Ctrl / Command key
-    const modifier = event.ctrlKey || event.metaKey;
-
-    if (!modifier) {
-        return;
-    }
-
-    const key = event.key.toLowerCase();
-
-
-    // Copy
-    if (key === "c") {
         event.preventDefault();
+
     }
+);
 
 
-    // Cut
-    if (key === "x") {
-        event.preventDefault();
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        const modifier =
+            event.ctrlKey ||
+            event.metaKey;
+
+        if (!modifier) {
+            return;
+        }
+
+        const key =
+            event.key.toLowerCase();
+
+
+        if (
+            key === "c" ||
+            key === "x" ||
+            key === "s" ||
+            key === "u"
+        ) {
+
+            event.preventDefault();
+
+        }
+
     }
+);
 
 
-    // Save page
-    if (key === "s") {
-        event.preventDefault();
+document.addEventListener(
+    "selectstart",
+    (event) => {
+
+        if (
+            event.target.closest(
+                ".story-content"
+            )
+        ) {
+
+            event.preventDefault();
+
+        }
+
     }
-
-
-    // View source
-    if (key === "u") {
-        event.preventDefault();
-    }
-
-});
-
-
-// Disable selecting story text
-document.addEventListener("selectstart", (event) => {
-
-    if (
-        event.target.closest(".story-content")
-    ) {
-        event.preventDefault();
-    }
-
-});
+);
