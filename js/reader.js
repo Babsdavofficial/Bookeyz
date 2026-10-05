@@ -258,58 +258,83 @@ async function loadBook() {
 /* =========================
    LOAD CHAPTERS
 ========================= */
-
 async function loadChapters() {
+    const chaptersQuery = query(
+        collection(db, "chapters"),
+        where("bookId", "==", bookId),
+        where("status", "==", "published"),
+        orderBy("number", "asc")
+    );
 
-    const chaptersQuery =
-        query(
-            collection(
-                db,
-                "chapters"
-            ),
-
-            where(
-                "bookId",
-                "==",
-                bookId
-            ),
-
-            where(
-                "status",
-                "==",
-                "published"
-            ),
-
-            orderBy(
-                "number",
-                "asc"
-            )
-        );
-
-
-    const chaptersSnapshot =
-        await getDocs(
-            chaptersQuery
-        );
-
+    const chaptersSnapshot = await getDocs(chaptersQuery);
 
     chapters = [];
 
+    chaptersSnapshot.forEach((chapterSnapshot) => {
+        chapters.push({
+            id: chapterSnapshot.id,
+            ...chapterSnapshot.data()
+        });
+    });
 
-    chaptersSnapshot.forEach(
-        (chapterSnapshot) => {
+    setupLanguageSelector();
+}
 
-            chapters.push({
-                id:
-                    chapterSnapshot.id,
+function setupLanguageSelector() {
+    const languageSelect = document.getElementById("languageSelect");
 
-                ...chapterSnapshot.data()
+    if (!languageSelect || chapters.length === 0) {
+        return;
+    }
 
-            });
+    const languages = [];
 
+    chapters.forEach((chapter) => {
+        if (
+            chapter.language &&
+            !languages.includes(chapter.language)
+        ) {
+            languages.push(chapter.language);
         }
-    );
+    });
 
+    languageSelect.innerHTML = "";
+
+    languages.forEach((language) => {
+        const option = document.createElement("option");
+
+        option.value = language;
+        option.textContent = getLanguageName(language);
+
+        languageSelect.appendChild(option);
+    });
+
+    const requestedLanguage = urlParams.get("lang");
+
+    if (requestedLanguage && languages.includes(requestedLanguage)) {
+        languageSelect.value = requestedLanguage;
+    } else {
+        languageSelect.value = languages[0];
+    }
+
+    languageSelect.addEventListener("change", () => {
+        const selectedLanguage = languageSelect.value;
+
+        window.location.href =
+            `reader.html?book=${bookId}&chapter=${chapterNumber}&lang=${selectedLanguage}`;
+    });
+}
+
+function getLanguageName(language) {
+    const languageNames = {
+        en: "English",
+        fr: "French",
+        es: "Spanish",
+        ar: "Arabic",
+        pt: "Portuguese"
+    };
+
+    return languageNames[language] || language;
 }
 
 
@@ -318,15 +343,14 @@ async function loadChapters() {
 ========================= */
 
 function findCurrentChapter() {
+    const selectedLanguage =
+        urlParams.get("lang") || chapters[0]?.language;
 
-    currentChapter =
-        chapters.find(
-            (chapter) =>
-                Number(
-                    chapter.number
-                ) === chapterNumber
-        );
-
+    currentChapter = chapters.find(
+        (chapter) =>
+            Number(chapter.number) === chapterNumber &&
+            chapter.language === selectedLanguage
+    );
 }
 
 
