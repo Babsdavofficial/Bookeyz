@@ -86,17 +86,33 @@
 
         <section class="section">
 
-            <div
-                class="book-grid"
-                id="booksGrid">
+    <div
+        class="book-grid"
+        id="booksGrid">
 
-                <p>
-                    Loading books...
-                </p>
+        <p>
+            Loading books...
+        </p>
 
-            </div>
+    </div>
 
-        </section>
+
+    <div
+        class="load-more-container"
+        id="loadMoreContainer"
+        style="display: none;">
+
+        <button
+            type="button"
+            id="loadMoreButton">
+
+            More Books
+
+        </button>
+
+    </div>
+
+</section>
 
     </main>
 
@@ -113,591 +129,899 @@
 
     </footer>
 
+<script type="module">
 
-    <script type="module">
+    import {
+        collection,
+        getDocs,
+        query,
+        where,
+        orderBy,
+        limit,
+        startAfter
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-        import {
-            collection,
-            getDocs,
-            query,
-            where,
-            orderBy
-        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
+    import {
+        db
+    } from "../js/firebase-config.js";
 
-        import {
-            db
-        } from "../js/firebase-config.js";
 
+    // =========================
+    // ELEMENTS
+    // =========================
 
-        const booksGrid =
-            document.getElementById(
-                "booksGrid"
-            );
+    const booksGrid =
+        document.getElementById(
+            "booksGrid"
+        );
 
 
-        const pageLabel =
-            document.getElementById(
-                "pageLabel"
-            );
+    const pageLabel =
+        document.getElementById(
+            "pageLabel"
+        );
 
 
-        const pageTitle =
-            document.getElementById(
-                "pageTitle"
-            );
+    const pageTitle =
+        document.getElementById(
+            "pageTitle"
+        );
 
 
-        const pageDescription =
-            document.getElementById(
-                "pageDescription"
-            );
+    const pageDescription =
+        document.getElementById(
+            "pageDescription"
+        );
 
 
-        /*
-         * Read information from the URL.
-         *
-         * Examples:
-         *
-         * books.html
-         *
-         * books.html?category=Fantasy
-         *
-         * books.html?search=dragon
-         */
+    const loadMoreContainer =
+        document.getElementById(
+            "loadMoreContainer"
+        );
 
-        const urlParams =
-            new URLSearchParams(
-                window.location.search
-            );
 
+    const loadMoreButton =
+        document.getElementById(
+            "loadMoreButton"
+        );
 
-        const selectedCategory =
-            urlParams.get(
-                "category"
-            );
 
+    // =========================
+    // PAGINATION
+    // =========================
 
-        const searchTerm =
-            urlParams.get(
-                "search"
-            );
+    const BOOKS_PER_PAGE = 20;
 
+    let lastVisibleBook = null;
 
-        async function loadBooks() {
+    let isLoadingMore = false;
 
-            try {
 
-                /*
-                 * CATEGORY MODE
-                 *
-                 * Example:
-                 * books.html?category=Fantasy
-                 */
+    // =========================
+    // URL PARAMETERS
+    // =========================
 
-                if (selectedCategory) {
+    const urlParams =
+        new URLSearchParams(
+            window.location.search
+        );
 
-                    await loadCategoryBooks();
 
-                    return;
+    const selectedCategory =
+        urlParams.get(
+            "category"
+        );
 
-                }
 
+    const searchTerm =
+        urlParams.get(
+            "search"
+        );
 
-                /*
-                 * SEARCH MODE
-                 *
-                 * Example:
-                 * books.html?search=dragon
-                 */
 
-                if (searchTerm) {
+    // =========================
+    // LOAD BOOKS
+    // =========================
 
-                    await loadSearchResults();
+    async function loadBooks() {
 
-                    return;
+        try {
 
-                }
+            if (selectedCategory) {
 
-
-                /*
-                 * NORMAL MODE
-                 *
-                 * Show every published book.
-                 */
-
-                await loadAllBooks();
-
-            } catch (error) {
-
-                console.error(
-                    "BOOKS ERROR:",
-                    error
-                );
-
-
-                booksGrid.innerHTML = `
-
-                    <p>
-                        Unable to load books.
-                    </p>
-
-                `;
-
-            }
-
-        }
-
-
-        /*
-         * Load all published books.
-         */
-
-        async function loadAllBooks() {
-
-            pageLabel.textContent =
-                "EXPLORE BOOKEYZ";
-
-
-            pageTitle.textContent =
-                "All Books";
-
-
-            pageDescription.textContent =
-                "Explore stories across different worlds, genres, and adventures.";
-
-
-            const booksQuery =
-                query(
-                    collection(
-                        db,
-                        "books"
-                    ),
-
-                    where(
-                        "status",
-                        "==",
-                        "published"
-                    ),
-
-                    orderBy(
-                        "createdAt",
-                        "desc"
-                    )
-                );
-
-
-            const snapshot =
-                await getDocs(
-                    booksQuery
-                );
-
-
-            displayBooks(
-                snapshot.docs
-            );
-
-        }
-
-
-        /*
-         * Load books from a category.
-         */
-
-        async function loadCategoryBooks() {
-
-            pageLabel.textContent =
-                "CATEGORY";
-
-
-            pageTitle.textContent =
-                selectedCategory;
-
-
-            pageDescription.textContent =
-                `Explore ${selectedCategory} stories on Bookeyz.`;
-
-
-            const booksQuery =
-                query(
-                    collection(
-                        db,
-                        "books"
-                    ),
-
-                    where(
-                        "status",
-                        "==",
-                        "published"
-                    ),
-
-                    where(
-                        "category",
-                        "==",
-                        selectedCategory
-                    ),
-
-                    orderBy(
-                        "createdAt",
-                        "desc"
-                    )
-                );
-
-
-            const snapshot =
-                await getDocs(
-                    booksQuery
-                );
-
-
-            displayBooks(
-                snapshot.docs,
-                `No books found in ${selectedCategory} yet.`
-            );
-
-        }
-
-
-        /*
-         * Search published books.
-         *
-         * Search checks:
-         *
-         * - title
-         * - author
-         * - category
-         * - tags
-         */
-
-        async function loadSearchResults() {
-
-            const cleanSearchTerm =
-                searchTerm
-                    .trim()
-                    .toLowerCase();
-
-
-            pageLabel.textContent =
-                "SEARCH";
-
-
-            pageTitle.textContent =
-                "Search Results";
-
-
-            pageDescription.textContent =
-                `Showing results for "${searchTerm}"`;
-
-
-            if (!cleanSearchTerm) {
-
-                await loadAllBooks();
+                await loadCategoryBooks();
 
                 return;
 
             }
 
 
-            /*
-             * Get all published books.
-             */
+            if (searchTerm) {
 
-            const booksQuery =
-                query(
-                    collection(
-                        db,
-                        "books"
-                    ),
+                await loadSearchResults();
 
-                    where(
-                        "status",
-                        "==",
-                        "published"
-                    ),
+                return;
 
-                    orderBy(
-                        "createdAt",
-                        "desc"
-                    )
-                );
+            }
 
 
-            const snapshot =
-                await getDocs(
-                    booksQuery
-                );
+            await loadAllBooks();
+
+        } catch (error) {
+
+            console.error(
+                "BOOKS ERROR:",
+                error
+            );
 
 
-            /*
-             * Find books matching
-             * the search term.
-             */
+            booksGrid.innerHTML = `
 
-            const matchingBooks =
-                snapshot.docs.filter(
-                    (documentSnapshot) => {
+                <p>
+                    Unable to load books.
+                </p>
 
-                        const book =
-                            documentSnapshot.data();
+            `;
 
+            loadMoreContainer.style.display =
+                "none";
 
-                        const title =
-                            (
-                                book.title ||
-                                ""
-                            ).toLowerCase();
+        }
+
+    }
 
 
-                        const author =
-                            (
-                                book.author ||
-                                ""
-                            ).toLowerCase();
+    // =========================
+    // LOAD ALL BOOKS
+    // =========================
+
+    async function loadAllBooks(
+        loadMore = false
+    ) {
+
+        pageLabel.textContent =
+            "EXPLORE BOOKEYZ";
 
 
-                        const category =
-                            (
-                                book.category ||
-                                ""
-                            ).toLowerCase();
+        pageTitle.textContent =
+            "All Books";
 
 
-                        const tags =
-                            Array.isArray(
-                                book.tags
-                            )
-                                ? book.tags.join(" ").toLowerCase()
-                                : (
-                                    book.tags ||
-                                    ""
-                                ).toLowerCase();
+        pageDescription.textContent =
+            "Explore stories across different worlds, genres, and adventures.";
 
 
-                        return (
+        if (!loadMore) {
 
-                            title.includes(
-                                cleanSearchTerm
-                            )
+            booksGrid.innerHTML = `
 
-                            ||
+                <p>
+                    Loading books...
+                </p>
 
-                            author.includes(
-                                cleanSearchTerm
-                            )
+            `;
 
-                            ||
+            lastVisibleBook = null;
 
-                            category.includes(
-                                cleanSearchTerm
-                            )
-
-                            ||
-
-                            tags.includes(
-                                cleanSearchTerm
-                            )
-
-                        );
-
-                    }
-                );
+        }
 
 
-            displayBooks(
-                matchingBooks,
-                `No books found for "${searchTerm}".`
+        const queryParts = [
+
+            collection(
+                db,
+                "books"
+            ),
+
+            where(
+                "status",
+                "==",
+                "published"
+            ),
+
+            orderBy(
+                "createdAt",
+                "desc"
+            ),
+
+            limit(
+                BOOKS_PER_PAGE
+            )
+
+        ];
+
+
+        if (
+            loadMore &&
+            lastVisibleBook
+        ) {
+
+            queryParts.push(
+                startAfter(
+                    lastVisibleBook
+                )
             );
 
         }
 
 
-        /*
-         * Display book cards.
-         */
+        const booksQuery =
+            query(
+                ...queryParts
+            );
 
-        function displayBooks(
-            documents,
-            emptyMessage = "No published books yet."
-        ) {
+
+        const snapshot =
+            await getDocs(
+                booksQuery
+            );
+
+
+        if (!loadMore) {
 
             booksGrid.innerHTML = "";
 
-
-            if (
-                documents.length === 0
-            ) {
-
-                booksGrid.innerHTML = `
-
-                    <p>
-                        ${emptyMessage}
-                    </p>
-
-                `;
-
-                return;
-
-            }
+        }
 
 
-            documents.forEach(
+        displayBooks(
+            snapshot.docs,
+            "No published books yet.",
+            true
+        );
+
+
+        if (
+            snapshot.docs.length <
+            BOOKS_PER_PAGE
+        ) {
+
+            loadMoreContainer.style.display =
+                "none";
+
+        } else {
+
+            loadMoreContainer.style.display =
+                "flex";
+
+        }
+
+
+        if (!snapshot.empty) {
+
+            lastVisibleBook =
+                snapshot.docs[
+                    snapshot.docs.length - 1
+                ];
+
+        }
+
+    }
+
+
+    // =========================
+    // LOAD CATEGORY BOOKS
+    // =========================
+
+    async function loadCategoryBooks(
+        loadMore = false
+    ) {
+
+        pageLabel.textContent =
+            "CATEGORY";
+
+
+        pageTitle.textContent =
+            selectedCategory;
+
+
+        pageDescription.textContent =
+            `Explore ${selectedCategory} stories on Bookeyz.`;
+
+
+        if (!loadMore) {
+
+            booksGrid.innerHTML = `
+
+                <p>
+                    Loading books...
+                </p>
+
+            `;
+
+            lastVisibleBook = null;
+
+        }
+
+
+        const queryParts = [
+
+            collection(
+                db,
+                "books"
+            ),
+
+            where(
+                "status",
+                "==",
+                "published"
+            ),
+
+            where(
+                "category",
+                "==",
+                selectedCategory
+            ),
+
+            orderBy(
+                "createdAt",
+                "desc"
+            ),
+
+            limit(
+                BOOKS_PER_PAGE
+            )
+
+        ];
+
+
+        if (
+            loadMore &&
+            lastVisibleBook
+        ) {
+
+            queryParts.push(
+                startAfter(
+                    lastVisibleBook
+                )
+            );
+
+        }
+
+
+        const booksQuery =
+            query(
+                ...queryParts
+            );
+
+
+        const snapshot =
+            await getDocs(
+                booksQuery
+            );
+
+
+        if (!loadMore) {
+
+            booksGrid.innerHTML = "";
+
+        }
+
+
+        displayBooks(
+            snapshot.docs,
+            `No books found in ${selectedCategory} yet.`,
+            true
+        );
+
+
+        if (
+            snapshot.docs.length <
+            BOOKS_PER_PAGE
+        ) {
+
+            loadMoreContainer.style.display =
+                "none";
+
+        } else {
+
+            loadMoreContainer.style.display =
+                "flex";
+
+        }
+
+
+        if (!snapshot.empty) {
+
+            lastVisibleBook =
+                snapshot.docs[
+                    snapshot.docs.length - 1
+                ];
+
+        }
+
+    }
+
+
+    // =========================
+    // SEARCH
+    // =========================
+
+    async function loadSearchResults() {
+
+        const cleanSearchTerm =
+            searchTerm
+                .trim()
+                .toLowerCase();
+
+
+        pageLabel.textContent =
+            "SEARCH";
+
+
+        pageTitle.textContent =
+            "Search Results";
+
+
+        pageDescription.textContent =
+            `Showing results for "${searchTerm}"`;
+
+
+        loadMoreContainer.style.display =
+            "none";
+
+
+        if (!cleanSearchTerm) {
+
+            await loadAllBooks();
+
+            return;
+
+        }
+
+
+        const booksQuery =
+            query(
+
+                collection(
+                    db,
+                    "books"
+                ),
+
+                where(
+                    "status",
+                    "==",
+                    "published"
+                ),
+
+                orderBy(
+                    "createdAt",
+                    "desc"
+                )
+
+            );
+
+
+        const snapshot =
+            await getDocs(
+                booksQuery
+            );
+
+
+        const matchingBooks =
+            snapshot.docs.filter(
                 (documentSnapshot) => {
 
                     const book =
                         documentSnapshot.data();
 
 
-                    const bookId =
-                        documentSnapshot.id;
+                    const title =
+                        (
+                            book.title ||
+                            ""
+                        ).toLowerCase();
 
 
-                    const cover =
-                        book.coverImage;
+                    const author =
+                        (
+                            book.author ||
+                            ""
+                        ).toLowerCase();
 
 
-                    const coverContent =
-                        cover
-
-                            ? `
-
-                                <img
-                                    src="${cover}"
-                                    alt="${book.title || "Book"} cover"
-                                >
-
-                              `
-
-                            : `
-
-                                <div class="cover-placeholder">
-
-                                    ${getInitials(
-                                        book.title
-                                    )}
-
-                                </div>
-
-                              `;
+                    const category =
+                        (
+                            book.category ||
+                            ""
+                        ).toLowerCase();
 
 
-                    const card =
-                        document.createElement(
-                            "article"
-                        );
+                    const tags =
+                        Array.isArray(
+                            book.tags
+                        )
+
+                            ? book.tags
+                                .join(" ")
+                                .toLowerCase()
+
+                            : (
+                                book.tags ||
+                                ""
+                            ).toLowerCase();
 
 
-                    card.className =
-                        "book-card";
+                    return (
 
+                        title.includes(
+                            cleanSearchTerm
+                        )
 
-                    card.innerHTML = `
+                        ||
 
-                        <a
-                            href="book.html?id=${bookId}"
-                            class="book-card"
-                        >
+                        author.includes(
+                            cleanSearchTerm
+                        )
 
-                            <div class="book-cover">
+                        ||
 
-                                ${coverContent}
+                        category.includes(
+                            cleanSearchTerm
+                        )
 
-                            </div>
+                        ||
 
+                        tags.includes(
+                            cleanSearchTerm
+                        )
 
-                            <div class="book-info">
-
-                                <p class="book-category">
-
-                                    ${book.category || "Uncategorized"}
-
-                                </p>
-
-
-                                <h3>
-
-                                    ${book.title || "Untitled Book"}
-
-                                </h3>
-
-
-                                <p class="book-meta">
-
-                                    ★
-                                    ${
-                                        Number(book.ratingCount || 0) > 0
-                                            ? (
-                                                Number(book.ratingTotal || 0) /
-                                                Number(book.ratingCount || 0)
-                                            ).toFixed(1)
-                                            : "New"
-                                    }
-
-                                </p>
-
-                            </div>
-
-                        </a>
-
-                    `;
-
-
-                    booksGrid.appendChild(
-                        card
                     );
 
                 }
             );
 
+
+        displayBooks(
+            matchingBooks,
+            `No books found for "${searchTerm}".`,
+            false
+        );
+
+    }
+
+
+    // =========================
+    // MORE BOOKS BUTTON
+    // =========================
+
+    loadMoreButton.addEventListener(
+        "click",
+        async () => {
+
+            if (isLoadingMore) {
+                return;
+            }
+
+
+            isLoadingMore = true;
+
+
+            loadMoreButton.disabled =
+                true;
+
+
+            loadMoreButton.textContent =
+                "Loading...";
+
+
+            try {
+
+                if (selectedCategory) {
+
+                    await loadCategoryBooks(
+                        true
+                    );
+
+                } else {
+
+                    await loadAllBooks(
+                        true
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "LOAD MORE ERROR:",
+                    error
+                );
+
+            } finally {
+
+                isLoadingMore =
+                    false;
+
+                loadMoreButton.disabled =
+                    false;
+
+                loadMoreButton.textContent =
+                    "More Books";
+
+            }
+
+        }
+    );
+
+
+    // =========================
+    // DISPLAY BOOK CARDS
+    // =========================
+
+    function displayBooks(
+        documents,
+        emptyMessage = "No published books yet.",
+        append = false
+    ) {
+
+        if (!append) {
+
+            booksGrid.innerHTML =
+                "";
+
         }
 
 
-        /*
-         * Generate initials when
-         * a book has no cover.
-         */
-
-        function getInitials(
-            title
+        if (
+            documents.length === 0 &&
+            !append
         ) {
 
-            if (!title) {
+            booksGrid.innerHTML = `
 
-                return "BK";
+                <p>
+                    ${emptyMessage}
+                </p>
 
-            }
+            `;
 
-
-            const words =
-                title
-                    .trim()
-                    .split(/\s+/);
-
-
-            if (
-                words.length === 1
-            ) {
-
-                return words[0]
-                    .substring(
-                        0,
-                        2
-                    )
-                    .toUpperCase();
-
-            }
-
-
-            return (
-                words[0][0] +
-                words[1][0]
-            ).toUpperCase();
+            return;
 
         }
 
 
-        loadBooks();
+        documents.forEach(
+            (documentSnapshot) => {
 
-    </script>
+                const book =
+                    documentSnapshot.data();
+
+
+                const bookId =
+                    documentSnapshot.id;
+
+
+                const cover =
+                    book.coverImage;
+
+
+                const coverContent =
+                    cover
+
+                        ? `
+
+                            <img
+                                src="${cover}"
+                                alt="${escapeHTML(
+                                    book.title ||
+                                    "Book"
+                                )} cover"
+                            >
+
+                          `
+
+                        : `
+
+                            <div class="cover-placeholder">
+
+                                ${getInitials(
+                                    book.title
+                                )}
+
+                            </div>
+
+                          `;
+
+
+                const card =
+                    document.createElement(
+                        "article"
+                    );
+
+
+                card.className =
+                    "book-card";
+
+
+                const ratingTotal =
+                    Number(
+                        book.ratingTotal ||
+                        0
+                    );
+
+
+                const ratingCount =
+                    Number(
+                        book.ratingCount ||
+                        0
+                    );
+
+
+                const rating =
+                    ratingCount > 0
+
+                        ? ratingTotal /
+                            ratingCount
+
+                        : 0;
+
+
+                card.innerHTML = `
+
+                    <a
+                        href="book.html?id=${bookId}"
+                        class="book-card"
+                    >
+
+                        <div class="book-cover">
+
+                            ${coverContent}
+
+                        </div>
+
+
+                        <div class="book-info">
+
+                            <p class="book-category">
+
+                                ${escapeHTML(
+                                    book.category ||
+                                    "Uncategorized"
+                                )}
+
+                            </p>
+
+
+                            <h3>
+
+                                ${escapeHTML(
+                                    book.title ||
+                                    "Untitled Book"
+                                )}
+
+                            </h3>
+
+
+                            <p class="book-meta">
+
+                                ★
+                                ${
+                                    rating > 0
+                                        ? rating.toFixed(1)
+                                        : "New"
+                                }
+
+                                <span>
+
+                                    ·
+                                    ${
+                                        ratingCount === 1
+                                            ? "1 rating"
+                                            : `${ratingCount} ratings`
+                                    }
+
+                                </span>
+
+                            </p>
+
+                        </div>
+
+                    </a>
+
+                `;
+
+
+                booksGrid.appendChild(
+                    card
+                );
+
+            }
+        );
+
+    }
+
+
+    // =========================
+    // GET INITIALS
+    // =========================
+
+    function getInitials(
+        title
+    ) {
+
+        if (!title) {
+
+            return "BK";
+
+        }
+
+
+        const words =
+            title
+                .trim()
+                .split(/\s+/);
+
+
+        if (
+            words.length === 1
+        ) {
+
+            return words[0]
+                .substring(
+                    0,
+                    2
+                )
+                .toUpperCase();
+
+        }
+
+
+        return (
+            words[0][0] +
+            words[1][0]
+        ).toUpperCase();
+
+    }
+
+
+    // =========================
+    // HTML SAFETY
+    // =========================
+
+    function escapeHTML(
+        value
+    ) {
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    // =========================
+    // START
+    // =========================
+
+    loadBooks();
+
+</script>
+   
 
 </body>
 
