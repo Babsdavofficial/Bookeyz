@@ -219,58 +219,337 @@
             "search"
         );
 
+        const selectedSort =
+    urlParams.get(
+        "sort"
+    );
+
 
     // =========================
     // LOAD BOOKS
     // =========================
 
-    async function loadBooks() {
+ async function loadBooks() {
 
-        try {
+    try {
 
-            if (selectedCategory) {
+        if (selectedCategory) {
 
-                await loadCategoryBooks();
+            await loadCategoryBooks();
 
-                return;
-
-            }
-
-
-            if (searchTerm) {
-
-                await loadSearchResults();
-
-                return;
-
-            }
-
-
-            await loadAllBooks();
-
-        } catch (error) {
-
-            console.error(
-                "BOOKS ERROR:",
-                error
-            );
-
-
-            booksGrid.innerHTML = `
-
-                <p>
-                    Unable to load books.
-                </p>
-
-            `;
-
-            loadMoreContainer.style.display =
-                "none";
+            return;
 
         }
 
+
+        if (searchTerm) {
+
+            await loadSearchResults();
+
+            return;
+
+        }
+
+
+        if (selectedSort === "popular") {
+
+            await loadPopularBooks();
+
+            return;
+
+        }
+
+
+        if (selectedSort === "new") {
+
+            await loadNewReleases();
+
+            return;
+
+        }
+
+
+        await loadAllBooks();
+
+    } catch (error) {
+
+        console.error(
+            "BOOKS ERROR:",
+            error
+        );
+
+
+        booksGrid.innerHTML = `
+
+            <p>
+                Unable to load books.
+            </p>
+
+        `;
+
+        loadMoreContainer.style.display =
+            "none";
+
     }
 
+}
+
+
+// =========================
+// LOAD NEW RELEASES
+// =========================
+
+async function loadNewReleases(
+    loadMore = false
+) {
+
+    pageLabel.textContent =
+        "FRESH STORIES";
+
+
+    pageTitle.textContent =
+        "New Releases";
+
+
+    pageDescription.textContent =
+        "Discover the latest stories published on Bookeyz.";
+
+
+    if (!loadMore) {
+
+        booksGrid.innerHTML = `
+
+            <p>
+                Loading new releases...
+            </p>
+
+        `;
+
+        lastVisibleBook = null;
+
+    }
+
+
+    const queryParts = [
+
+        collection(
+            db,
+            "books"
+        ),
+
+        where(
+            "status",
+            "==",
+            "published"
+        ),
+
+        orderBy(
+            "createdAt",
+            "desc"
+        ),
+
+        limit(
+            BOOKS_PER_PAGE
+        )
+
+    ];
+
+
+    if (
+        loadMore &&
+        lastVisibleBook
+    ) {
+
+        queryParts.push(
+            startAfter(
+                lastVisibleBook
+            )
+        );
+
+    }
+
+
+    const booksQuery =
+        query(
+            ...queryParts
+        );
+
+
+    const snapshot =
+        await getDocs(
+            booksQuery
+        );
+
+
+    if (!loadMore) {
+
+        booksGrid.innerHTML = "";
+
+    }
+
+
+    displayBooks(
+        snapshot.docs,
+        "No new releases yet.",
+        true
+    );
+
+
+    if (
+        snapshot.docs.length <
+        BOOKS_PER_PAGE
+    ) {
+
+        loadMoreContainer.style.display =
+            "none";
+
+    } else {
+
+        loadMoreContainer.style.display =
+            "flex";
+
+    }
+
+
+    if (!snapshot.empty) {
+
+        lastVisibleBook =
+            snapshot.docs[
+                snapshot.docs.length - 1
+            ];
+
+    }
+
+}
+
+
+
+// =========================
+// LOAD POPULAR BOOKS
+// =========================
+
+async function loadPopularBooks(
+    loadMore = false
+) {
+
+    pageLabel.textContent =
+        "READERS ARE EXPLORING";
+
+
+    pageTitle.textContent =
+        "Popular Stories";
+
+
+    pageDescription.textContent =
+        "Discover the stories readers are exploring most.";
+
+
+    if (!loadMore) {
+
+        booksGrid.innerHTML = `
+
+            <p>
+                Loading popular stories...
+            </p>
+
+        `;
+
+        lastVisibleBook = null;
+
+    }
+
+
+    const queryParts = [
+
+        collection(
+            db,
+            "books"
+        ),
+
+        where(
+            "status",
+            "==",
+            "published"
+        ),
+
+        orderBy(
+            "readerCount",
+            "desc"
+        ),
+
+        limit(
+            BOOKS_PER_PAGE
+        )
+
+    ];
+
+
+    if (
+        loadMore &&
+        lastVisibleBook
+    ) {
+
+        queryParts.push(
+            startAfter(
+                lastVisibleBook
+            )
+        );
+
+    }
+
+
+    const booksQuery =
+        query(
+            ...queryParts
+        );
+
+
+    const snapshot =
+        await getDocs(
+            booksQuery
+        );
+
+
+    if (!loadMore) {
+
+        booksGrid.innerHTML = "";
+
+    }
+
+
+    displayBooks(
+        snapshot.docs,
+        "No popular stories yet.",
+        true
+    );
+
+
+    if (
+        snapshot.docs.length <
+        BOOKS_PER_PAGE
+    ) {
+
+        loadMoreContainer.style.display =
+            "none";
+
+    } else {
+
+        loadMoreContainer.style.display =
+            "flex";
+
+    }
+
+
+    if (!snapshot.empty) {
+
+        lastVisibleBook =
+            snapshot.docs[
+                snapshot.docs.length - 1
+            ];
+
+    }
+
+}
 
     // =========================
     // LOAD ALL BOOKS
@@ -710,17 +989,25 @@
 
                 if (selectedCategory) {
 
-                    await loadCategoryBooks(
-                        true
-                    );
+    await loadCategoryBooks(true);
 
-                } else {
+} else if (searchTerm) {
 
-                    await loadAllBooks(
-                        true
-                    );
+    // Search currently does not use pagination.
 
-                }
+} else if (selectedSort === "popular") {
+
+    await loadPopularBooks(true);
+
+} else if (selectedSort === "new") {
+
+    await loadNewReleases(true);
+
+} else {
+
+    await loadAllBooks(true);
+
+}
 
             } catch (error) {
 
