@@ -831,101 +831,183 @@ async function submitRating(selectedRating) {
             "ratings",
             `${currentUser.uid}_${bookId}`
         );
-const transactionResult = await runTransaction(
-    db,
-    async (transaction) => {
 
-        const bookSnapshot =
-            await transaction.get(bookReference);
+        const transactionResult = await runTransaction(
+            db,
+            async (transaction) => {
 
-        const ratingSnapshot =
-            await transaction.get(ratingReference);
+                // Always read the book first.
+                const bookSnapshot =
+                    await transaction.get(
+                        bookReference
+                    );
 
-        if (!bookSnapshot.exists()) {
-            throw new Error(
-                "This book could not be found."
-            );
-        }
+                if (!bookSnapshot.exists()) {
 
-        const bookData =
-            bookSnapshot.data();
+                    throw new Error(
+                        "This book could not be found."
+                    );
 
-        const currentTotal =
-            Number(bookData.ratingTotal || 0);
+                }
 
-        const currentCount =
-            Number(bookData.ratingCount || 0);
+                const bookData =
+                    bookSnapshot.data();
 
-        const existingRating =
-            ratingSnapshot.exists()
-                ? Number(
-                    ratingSnapshot.data().rating || 0
-                )
-                : 0;
+                const currentTotal =
+                    Number(
+                        bookData.ratingTotal || 0
+                    );
 
-        let newTotal;
-        let newCount;
+                const currentCount =
+                    Number(
+                        bookData.ratingCount || 0
+                    );
 
-        if (ratingSnapshot.exists()) {
 
-            newTotal =
-                currentTotal -
-                existingRating +
-                selectedRating;
+                // =========================
+                // FIRST-TIME RATING
+                // =========================
 
-            newCount =
-                currentCount;
+                if (!userRatingDocumentId) {
 
-        } else {
+                    const newTotal =
+                        currentTotal +
+                        selectedRating;
 
-            newTotal =
-                currentTotal +
-                selectedRating;
+                    const newCount =
+                        currentCount + 1;
 
-            newCount =
-                currentCount + 1;
 
-        }
+                    const ratingData = {
 
-        const ratingData = {
-            userId: currentUser.uid,
-            bookId: bookId,
-            rating: selectedRating,
-            updatedAt: new Date()
-        };
+                        userId:
+                            currentUser.uid,
 
-        if (!ratingSnapshot.exists()) {
-            ratingData.createdAt = new Date();
-        }
+                        bookId:
+                            bookId,
 
-        transaction.set(
-            ratingReference,
-            ratingData,
-            {
-                merge: true
+                        rating:
+                            selectedRating,
+
+                        createdAt:
+                            new Date(),
+
+                        updatedAt:
+                            new Date()
+
+                    };
+
+
+                    transaction.set(
+                        ratingReference,
+                        ratingData
+                    );
+
+
+                    transaction.update(
+                        bookReference,
+                        {
+                            ratingTotal:
+                                newTotal,
+
+                            ratingCount:
+                                newCount
+                        }
+                    );
+
+
+                    return {
+
+                        total:
+                            newTotal,
+
+                        count:
+                            newCount
+
+                    };
+
+                }
+
+
+                // =========================
+                // EXISTING RATING
+                // =========================
+
+                const ratingSnapshot =
+                    await transaction.get(
+                        ratingReference
+                    );
+
+
+                if (!ratingSnapshot.exists()) {
+
+                    throw new Error(
+                        "Your existing rating could not be found."
+                    );
+
+                }
+
+
+                const existingRating =
+                    Number(
+                        ratingSnapshot.data().rating || 0
+                    );
+
+
+                const newTotal =
+                    currentTotal -
+                    existingRating +
+                    selectedRating;
+
+
+                const newCount =
+                    currentCount;
+
+
+                transaction.update(
+                    ratingReference,
+                    {
+                        rating:
+                            selectedRating,
+
+                        updatedAt:
+                            new Date()
+                    }
+                );
+
+
+                transaction.update(
+                    bookReference,
+                    {
+                        ratingTotal:
+                            newTotal,
+
+                        ratingCount:
+                            newCount
+                    }
+                );
+
+
+                return {
+
+                    total:
+                        newTotal,
+
+                    count:
+                        newCount
+
+                };
+
             }
         );
 
-        transaction.update(
-            bookReference,
-            {
-                ratingTotal: newTotal,
-                ratingCount: newCount
-            }
-        );
 
-        return {
-            total: newTotal,
-            count: newCount
-        };
-    }
-);
+        const newTotal =
+            transactionResult.total;
 
-const newTotal =
-    transactionResult.total;
+        const newCount =
+            transactionResult.count;
 
-const newCount =
-    transactionResult.count;
 
         userRatingDocumentId =
             ratingReference.id;
@@ -933,19 +1015,23 @@ const newCount =
         userRating =
             selectedRating;
 
+
         highlightRating(
             selectedRating
         );
+
 
         const average =
             newCount > 0
                 ? newTotal / newCount
                 : 0;
 
+
         bookRating.textContent =
             average > 0
                 ? `★ ${average.toFixed(1)}`
                 : "★ New";
+
 
         ratingCount.textContent =
             `${newCount} ${
@@ -954,8 +1040,10 @@ const newCount =
                     : "ratings"
             }`;
 
+
         ratingMessage.textContent =
             "Your rating has been saved.";
+
 
     } catch (error) {
 
@@ -970,7 +1058,6 @@ const newCount =
     }
 
 }
-
 
 // -------------------------
 // HIGHLIGHT STARS
