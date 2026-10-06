@@ -723,23 +723,20 @@ async function loadUserRating() {
 
     try {
 
-        const ratingReference = doc(
-            db,
-            "ratings",
-            `${currentUser.uid}_${bookId}`
+        const ratingsQuery = query(
+            collection(db, "ratings"),
+            where("userId", "==", currentUser.uid),
+            where("bookId", "==", bookId)
         );
 
-        const ratingSnapshot = await getDoc(
-            ratingReference
-        );
+        const snapshot = await getDocs(ratingsQuery);
 
-        if (ratingSnapshot.exists()) {
+        if (!snapshot.empty) {
 
-            const ratingData =
-                ratingSnapshot.data();
+            const ratingDocument = snapshot.docs[0];
+            const ratingData = ratingDocument.data();
 
-            userRatingDocumentId =
-                ratingSnapshot.id;
+            userRatingDocumentId = ratingDocument.id;
 
             userRating =
                 Number(ratingData.rating || 0);
@@ -763,7 +760,6 @@ async function loadUserRating() {
     }
 
 }
-
 // -------------------------
 // STAR CLICK
 // -------------------------
