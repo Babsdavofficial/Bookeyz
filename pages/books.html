@@ -623,7 +623,14 @@
                                 <p class="book-meta">
 
                                     ★
-                                    ${book.ratingAverage || "New"}
+                                    ${
+                                        Number(book.ratingCount || 0) > 0
+                                            ? (
+                                                Number(book.ratingTotal || 0) /
+                                                Number(book.ratingCount || 0)
+                                            ).toFixed(1)
+                                            : "New"
+                                    }
 
                                 </p>
 

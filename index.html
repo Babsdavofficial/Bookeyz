@@ -123,10 +123,8 @@
 
         </section>
 
-
-
-        <!-- =========================
-             FEATURED STORIES
+<!-- =========================
+             POPULAR STORIES
         ========================== -->
 
         <section class="section">
@@ -136,11 +134,11 @@
                 <div>
 
                     <p class="section-label">
-                        DISCOVER
+                        READERS ARE EXPLORING
                     </p>
 
                     <h2>
-                        Featured Stories
+                        Popular Stories
                     </h2>
 
                 </div>
@@ -155,15 +153,19 @@
 
             <div
                 class="book-grid"
-                id="featuredBooks">
+                id="popularBooks">
 
                 <p class="empty-message">
-                    Loading featured stories...
+                    Loading popular stories...
                 </p>
 
             </div>
 
         </section>
+
+      
+
+        
 
 
 
@@ -388,10 +390,7 @@
         // ELEMENTS
         // =========================
 
-        const featuredBooks =
-            document.getElementById(
-                "featuredBooks"
-            );
+       
 
 
         const newReleases =
@@ -462,55 +461,7 @@
 
 
 
-        // =========================
-        // LOAD FEATURED STORIES
-        // =========================
-
-        async function loadFeaturedBooks() {
-
-            try {
-
-                const books =
-                    await getPublishedBooks();
-
-
-                /*
-                 * For now, featured stories use
-                 * the newest published books.
-                 *
-                 * Later the admin can choose
-                 * featured books individually.
-                 */
-
-                const featured =
-                    books.slice(
-                        0,
-                        3
-                    );
-
-
-                displayBooks(
-                    featuredBooks,
-                    featured,
-                    "No featured stories yet."
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "FEATURED BOOKS ERROR:",
-                    error
-                );
-
-
-                showLoadError(
-                    featuredBooks
-                );
-
-            }
-
-        }
+        
 
 
 
@@ -613,7 +564,7 @@
                         ),
 
                         orderBy(
-                            "ratingCount",
+                            "readerCount",
                             "desc"
                         ),
 
@@ -821,16 +772,22 @@
                         "book-card";
 
 
-                    const rating =
-                        Number(
-                            book.ratingAverage || 0
-                        );
+                    const ratingTotal =
+                    Number(
+                        book.ratingTotal || 0
+                    );
 
 
-                    const ratingCount =
-                        Number(
-                            book.ratingCount || 0
-                        );
+                const ratingCount =
+                    Number(
+                        book.ratingCount || 0
+                    );
+
+
+                const rating =
+                    ratingCount > 0
+                        ? ratingTotal / ratingCount
+                        : 0;
 
 
                     const ratingText =
@@ -939,7 +896,7 @@
 
 
                                 <p class="book-meta">
-
+-
                                     ${priceText}
 
                                 </p>
