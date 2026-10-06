@@ -1,32 +1,88 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const { setGlobalOptions } = require("firebase-functions");
+const {
+    onDocumentWritten
+} = require("firebase-functions/v2/firestore");
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+const {
+    initializeApp
+} = require("firebase-admin/app");
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+const {
+    getFirestore
+} = require("firebase-admin/firestore");
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+setGlobalOptions({
+    maxInstances: 10,
+    region: "us-east4"
+});
+
+
+initializeApp();
+
+const db = getFirestore();
+
+
+exports.syncBookRating = onDocumentWritten(
+    "ratings/{ratingId}",
+    async (event) => {
+
+        const before = event.data?.before?.data();
+        const after = event.data?.after?.data();
+
+        const affectedBookIds = new Set();
+
+        if (before?.bookId) {
+            affectedBookIds.add(before.bookId);
+        }
+
+        if (after?.bookId) {
+            affectedBookIds.add(after.bookId);
+        }
+
+
+        for (const bookId of affectedBookIds) {
+
+            const ratingsSnapshot = await db
+                .collection("ratings")
+                .where("bookId", "==", bookId)
+                .get();
+
+
+            let total = 0;
+
+            ratingsSnapshot.forEach((ratingDoc) => {
+
+                const ratingData = ratingDoc.data();
+
+                total += Number(
+                    ratingData.rating || 0
+                );
+
+            });
+
+
+            const ratingCount =
+                ratingsSnapshot.size;
+
+
+            const ratingAverage =
+                ratingCount > 0
+                    ? Number(
+                        (total / ratingCount).toFixed(1)
+                    )
+                    : 0;
+
+
+            await db
+                .collection("books")
+                .doc(bookId)
+                .update({
+                    ratingAverage,
+                    ratingCount
+                });
+
+        }
+
+    }
+);

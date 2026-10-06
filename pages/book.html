@@ -255,7 +255,7 @@
 
     <script type="module">
 
-        import {
+    import {
     doc,
     getDoc,
     collection,
@@ -265,7 +265,8 @@
     updateDoc,
     query,
     where,
-    orderBy
+    orderBy,
+    runTransaction
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
@@ -485,11 +486,16 @@ const ratingMessage =
                 // BOOK STATS
                 // =========================
 
-               const rating =
-    Number(book.ratingAverage || 0);
+              const ratingTotal =
+    Number(book.ratingTotal || 0);
 
 const totalRatings =
     Number(book.ratingCount || 0);
+
+const rating =
+    totalRatings > 0
+        ? ratingTotal / totalRatings
+        : 0;
 
 const isFree =
     book.free === true;
@@ -527,9 +533,8 @@ document.getElementById(
                 // =========================
 
                 loadChapters(
-                    bookId
-                );
-                loadBookRating();
+                bookId
+            );
 
 
             } catch (error) {
@@ -718,47 +723,33 @@ async function loadUserRating() {
 
     try {
 
-        const ratingQuery =
-            query(
-                collection(
-                    db,
-                    "ratings"
-                ),
+        const ratingReference = doc(
+            db,
+            "ratings",
+            `${currentUser.uid}_${bookId}`
+        );
 
-                where(
-                    "userId",
-                    "==",
-                    currentUser.uid
-                ),
+        const ratingSnapshot = await getDoc(
+            ratingReference
+        );
 
-                where(
-                    "bookId",
-                    "==",
-                    bookId
-                )
-            );
+        if (ratingSnapshot.exists()) {
 
-        const snapshot =
-            await getDocs(
-                ratingQuery
-            );
-
-        if (!snapshot.empty) {
-
-            const ratingDocument =
-                snapshot.docs[0];
+            const ratingData =
+                ratingSnapshot.data();
 
             userRatingDocumentId =
-                ratingDocument.id;
+                ratingSnapshot.id;
 
             userRating =
-                Number(
-                    ratingDocument.data().rating
-                );
+                Number(ratingData.rating || 0);
 
-            highlightRating(
-                userRating
-            );
+            highlightRating(userRating);
+
+        } else {
+
+            userRatingDocumentId = null;
+            userRating = 0;
 
         }
 
@@ -772,7 +763,6 @@ async function loadUserRating() {
     }
 
 }
-
 
 // -------------------------
 // STAR CLICK
@@ -809,9 +799,7 @@ if (ratingStars) {
 // SUBMIT RATING
 // -------------------------
 
-async function submitRating(
-    selectedRating
-) {
+async function submitRating(selectedRating) {
 
     if (!currentUser) {
 
@@ -822,7 +810,6 @@ async function submitRating(
             )}`;
 
         return;
-
     }
 
     if (
@@ -837,77 +824,142 @@ async function submitRating(
         ratingMessage.textContent =
             "Saving rating...";
 
+        const bookReference = doc(
+            db,
+            "books",
+            bookId
+        );
 
-        const ratingData = {
+        const ratingReference = doc(
+            db,
+            "ratings",
+            `${currentUser.uid}_${bookId}`
+        );
+const transactionResult = await runTransaction(
+    db,
+    async (transaction) => {
 
-            userId:
-                currentUser.uid,
+        const bookSnapshot =
+            await transaction.get(bookReference);
 
-            bookId:
-                bookId,
+        const ratingSnapshot =
+            await transaction.get(ratingReference);
 
-            rating:
-                selectedRating,
-
-            updatedAt:
-                new Date()
-
-        };
-
-
-        if (
-            userRatingDocumentId
-        ) {
-
-            await updateDoc(
-
-                doc(
-                    db,
-                    "ratings",
-                    userRatingDocumentId
-                ),
-
-                ratingData
-
+        if (!bookSnapshot.exists()) {
+            throw new Error(
+                "This book could not be found."
             );
+        }
+
+        const bookData =
+            bookSnapshot.data();
+
+        const currentTotal =
+            Number(bookData.ratingTotal || 0);
+
+        const currentCount =
+            Number(bookData.ratingCount || 0);
+
+        const existingRating =
+            ratingSnapshot.exists()
+                ? Number(
+                    ratingSnapshot.data().rating || 0
+                )
+                : 0;
+
+        let newTotal;
+        let newCount;
+
+        if (ratingSnapshot.exists()) {
+
+            newTotal =
+                currentTotal -
+                existingRating +
+                selectedRating;
+
+            newCount =
+                currentCount;
 
         } else {
 
-            const newRating =
-                await addDoc(
+            newTotal =
+                currentTotal +
+                selectedRating;
 
-                    collection(
-                        db,
-                        "ratings"
-                    ),
-
-                    {
-                        ...ratingData,
-                        createdAt:
-                            new Date()
-                    }
-
-                );
-
-            userRatingDocumentId =
-                newRating.id;
+            newCount =
+                currentCount + 1;
 
         }
 
+        const ratingData = {
+            userId: currentUser.uid,
+            bookId: bookId,
+            rating: selectedRating,
+            updatedAt: new Date()
+        };
+
+        if (!ratingSnapshot.exists()) {
+            ratingData.createdAt = new Date();
+        }
+
+        transaction.set(
+            ratingReference,
+            ratingData,
+            {
+                merge: true
+            }
+        );
+
+        transaction.update(
+            bookReference,
+            {
+                ratingTotal: newTotal,
+                ratingCount: newCount
+            }
+        );
+
+        return {
+            total: newTotal,
+            count: newCount
+        };
+    }
+);
+
+const newTotal =
+    transactionResult.total;
+
+const newCount =
+    transactionResult.count;
+
+        userRatingDocumentId =
+            ratingReference.id;
 
         userRating =
             selectedRating;
-
 
         highlightRating(
             selectedRating
         );
 
+        const average =
+            newCount > 0
+                ? newTotal / newCount
+                : 0;
+
+        bookRating.textContent =
+            average > 0
+                ? `★ ${average.toFixed(1)}`
+                : "★ New";
+
+        ratingCount.textContent =
+            `${newCount} ${
+                newCount === 1
+                    ? "rating"
+                    : "ratings"
+            }`;
 
         ratingMessage.textContent =
-    "Your rating has been saved.";
-
-        
+            "Your rating has been saved.";
 
     } catch (error) {
 
@@ -964,60 +1016,7 @@ function highlightRating(
 // RECALCULATE BOOK RATING
 // -------------------------
 
-async function loadBookRating() {
 
-    if (!bookId) {
-        return;
-    }
-
-    try {
-
-        const ratingsQuery = query(
-            collection(db, "ratings"),
-            where("bookId", "==", bookId)
-        );
-
-        const snapshot = await getDocs(ratingsQuery);
-
-        const ratingCountValue = snapshot.size;
-
-        let total = 0;
-
-        snapshot.forEach((ratingDocument) => {
-
-            const ratingData = ratingDocument.data();
-
-            total += Number(ratingData.rating || 0);
-
-        });
-
-        const average =
-            ratingCountValue > 0
-                ? total / ratingCountValue
-                : 0;
-
-        bookRating.textContent =
-            average > 0
-                ? `★ ${average.toFixed(1)}`
-                : "★ New";
-
-        ratingCount.textContent =
-            `${ratingCountValue} ${
-                ratingCountValue === 1
-                    ? "rating"
-                    : "ratings"
-            }`;
-
-    } catch (error) {
-
-        console.error(
-            "LOAD BOOK RATING ERROR:",
-            error
-        );
-
-    }
-
-}
 
 
         // =========================
